@@ -1,4 +1,4 @@
-﻿namespace ConsoleApp2;
+﻿namespace TAiO;
 
 public class Graph
 {
@@ -10,10 +10,10 @@ public class Graph
         adjMatrix = new bool[n, n];
     }
 
-    //pierwszy wiersz pliku zawiera liczbę wierzchołków pierwszego grafu, ta informacja jest zapisana w jednym wierszu pliku,
-    //następne wiersze pliku zawierają wiersze macierzy sąsiedztwa pierwszego grafu z elementami oddzielonymi spacją,
-    //kolejny wiersz pliku zawiera liczbę wierzchołków drugiego grafu,
-    //następne wiersze pliku zawierają wiersze macierzy sąsiedztwa drugiego grafu,
+    // Pierwszy wiersz pliku zawiera liczbę wierzchołków pierwszego grafu, ta informacja jest zapisana w jednym wierszu pliku,
+    // następne wiersze pliku zawierają wiersze macierzy sąsiedztwa pierwszego grafu z elementami oddzielonymi spacją,
+    // kolejny wiersz pliku zawiera liczbę wierzchołków drugiego grafu,
+    // następne wiersze pliku zawierają wiersze macierzy sąsiedztwa drugiego grafu.
     internal static (Graph, Graph) ReadTwoFromFile(string path)
     {
         var rawLines = File.ReadAllLines(path).Select(l => l.Trim()).ToArray();
@@ -23,8 +23,8 @@ public class Graph
         var g1 = new Graph(n1);
         for (var r = 0; r < n1; ++r)
         {
-            var tokens = rawLines[index++].Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
-            for (int c = 0; c < n1; ++c)
+            var tokens = rawLines[index++].Split(null as string[], StringSplitOptions.RemoveEmptyEntries);
+            for (var c = 0; c < n1; ++c)
                 g1.adjMatrix[r, c] = ParseBooleanToken(tokens[c]);
         }
 
@@ -32,7 +32,7 @@ public class Graph
         var g2 = new Graph(n2);
         for (var r = 0; r < n2; ++r)
         {
-            var tokens = rawLines[index++].Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
+            var tokens = rawLines[index++].Split(null as string[], StringSplitOptions.RemoveEmptyEntries);
             for (var c = 0; c < n2; ++c)
                 g2.adjMatrix[r, c] = ParseBooleanToken(tokens[c]);
         }

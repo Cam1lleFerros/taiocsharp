@@ -40,5 +40,12 @@ public class Graph
         return (g1, g2);
     }
 
+    public bool HasEdge(int a, int b)
+    {
+        if (a < 0 || b < 0 || a >= size || b >= size) throw new IndexOutOfRangeException($"Vertex indexes must be in range [0;n). Arguments given: {a}, {b}");
+
+        return adjMatrix[a, b];
+    }
+
     private static bool ParseBooleanToken(string token) => token != "0";
 }

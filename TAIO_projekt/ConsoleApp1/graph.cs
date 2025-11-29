@@ -17,7 +17,7 @@ public class Graph
     internal static (Graph, Graph) ReadTwoFromFile(string path)
     {
         var rawLines = File.ReadAllLines(path).Select(l => l.Trim()).ToArray();
-        int index = 0;
+        var index = 0;
 
         var n1 = int.Parse(rawLines[index++]);
         var g1 = new Graph(n1);
@@ -38,11 +38,13 @@ public class Graph
         }
 
         return (g1, g2);
+        static bool ParseBooleanToken(string token) => token != "0";
     }
 
     public bool HasEdge(int a, int b)
     {
-        if (a < 0 || b < 0 || a >= size || b >= size) throw new IndexOutOfRangeException($"Vertex indexes must be in range [0;n). Arguments given: {a}, {b}");
+        if (a < 0 || b < 0 || a >= size || b >= size) 
+            throw new IndexOutOfRangeException($"Vertex indexes must be in range [0;n). Arguments given: {a}, {b}");
 
         return adjMatrix[a, b];
     }

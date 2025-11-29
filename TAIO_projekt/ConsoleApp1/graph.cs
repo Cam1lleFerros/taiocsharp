@@ -47,5 +47,29 @@ public class Graph
         return adjMatrix[a, b];
     }
 
+    public IEnumerable<int> OutNeighbours(int a)
+    {
+        for(int i = 0; i< size; i++)
+        {
+            if (i!=a && adjMatrix[a, i])
+            {
+                yield return i;
+            }
+        }
+    }
+
+    public int OutDegree(int a)
+    {
+        int degree = 0;
+        for (int i = 0; i < size; i++)
+        {
+            if (i != a && adjMatrix[a, i])
+            {
+                degree++;
+            }
+        }
+        return degree;
+    }
+
     private static bool ParseBooleanToken(string token) => token != "0";
 }

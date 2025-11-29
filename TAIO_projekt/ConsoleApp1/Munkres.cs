@@ -6,7 +6,7 @@ namespace TAiO
 {
     internal class Munkres
     {
-        public void muknres(int[,] tab)
+        public (bool[,], int[,]) muknres(int[,] tab)
         {
 
             int x=tab.GetLength(0);
@@ -216,8 +216,9 @@ namespace TAiO
             }
         Break:
             {
-
+                return (star,tab);
             }
+
 
         }
     }

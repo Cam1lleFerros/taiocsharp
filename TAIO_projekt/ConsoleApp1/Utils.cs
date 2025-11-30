@@ -10,7 +10,7 @@ namespace SubgraphIsomorphism
     public class SIOptions
     {
         public string inPath = "input.txt";
-        public string? outPath = "output.txt";
+        public string outPath = "output.txt";
         public bool help = false;
         public bool exact = false;
         public bool approximate = false;

@@ -1,5 +1,6 @@
 ﻿using SubgraphIsomorphism.Munkres;
 using SubgraphIsomorphism;
+using SubgraphIsomorphism.Ullman;
 
 internal class Program
 {

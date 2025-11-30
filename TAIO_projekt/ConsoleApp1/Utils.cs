@@ -28,42 +28,42 @@ namespace SubgraphIsomorphism
         };
             List<string> extra = opts.Parse(args);
 
-        if (help)
-        {
-            ShowHelp(opts);
-            Environment.Exit(0);
-        }
-
-        if (!exact && !approximate)
-        {
-            throw new ArgumentException("At least one of --exact or --approximate options must be specified.");
-        }
-    }
-
-    static void ShowHelp(OptionSet p)
-    {
-        Console.WriteLine("Usage:");
-        Console.WriteLine("The program solves the Subgraph Isomorphism Problem with either the Ullman or Munkres algorithms.");
-        Console.WriteLine();
-        Console.WriteLine("The following options can be used:");
-        p.WriteOptionDescriptions(Console.Out);
-    }
-}
-public static class Utils
-{
-    public static void PrintMatrix(bool[,] matrix, System.IO.TextWriter writer)
-    {
-        var rows = matrix.GetLength(0);
-        var cols = matrix.GetLength(1);
-        for (var i = 0; i < rows; ++i)
-        {
-            for (var j = 0; j < cols; ++j)
+            if (help)
             {
-                writer.Write(matrix[i, j] ? "1 " : "0 ");
+                ShowHelp(opts);
+                Environment.Exit(0);
             }
-            writer.WriteLine();
+
+            if (!exact && !approximate)
+            {
+                throw new ArgumentException("At least one of --exact or --approximate options must be specified.");
+            }
+        }
+
+        static void ShowHelp(OptionSet p)
+        {
+            Console.WriteLine("Usage:");
+            Console.WriteLine("The program solves the Subgraph Isomorphism Problem with either the Ullman or Munkres algorithms.");
+            Console.WriteLine();
+            Console.WriteLine("The following options can be used:");
+            p.WriteOptionDescriptions(Console.Out);
         }
     }
+    public static class Utils
+    {
+        public static void PrintMatrix(bool[,] matrix, System.IO.TextWriter writer)
+        {
+            var rows = matrix.GetLength(0);
+            var cols = matrix.GetLength(1);
+            for (var i = 0; i < rows; ++i)
+            {
+                for (var j = 0; j < cols; ++j)
+                {
+                    writer.Write(matrix[i, j] ? "1 " : "0 ");
+                }
+                writer.WriteLine();
+            }
+        }
 
         public static void PrintMatrix(bool[,] matrix)
         {
@@ -83,30 +83,31 @@ public static class Utils
         {
             var (p, g) = Graph.ReadTwoFromFile(inPath);
 
-        Graph g1, g2;
-        if (p.size > g.size)
-        {
-            g2 = p;
-            g1 = g;
-        }
-        else if (p.size == g.size)
-        {
-            if (p.EdgeCount() >= g.EdgeCount())
+            Graph g1, g2;
+            if (p.size > g.size)
             {
-                g1 = p;
-                g2 = g;
+                g2 = p;
+                g1 = g;
+            }
+            else if (p.size == g.size)
+            {
+                if (p.EdgeCount() >= g.EdgeCount())
+                {
+                    g1 = p;
+                    g2 = g;
+                }
+                else
+                {
+                    g1 = g;
+                    g2 = p;
+                }
             }
             else
             {
-                g1 = g;
-                g2 = p;
+                g2 = g;
+                g1 = p;
             }
+            return (g1, g2);
         }
-        else
-        {
-            g2 = g;
-            g1 = p;
-        }
-        return (g1, g2);
     }
 }

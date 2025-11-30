@@ -1,7 +1,5 @@
-﻿using NDesk.Options;
-using SubgraphIsomorphism.Munkres;
+﻿using SubgraphIsomorphism.Munkres;
 using SubgraphIsomorphism;
-using SubgraphIsomorphism.Ullman;
 
 internal class Program
 {
@@ -12,6 +10,7 @@ internal class Program
 
         using var writer = File.CreateText(options.outPath);
 
+        options.exact = true;
         if (options.exact)
         {
             var ullman = new Ullman(g1, g2);
@@ -24,8 +23,11 @@ internal class Program
             }
             else
             {
-                // Wywował metodę extend z Ullmana
-                // Wydrukuj nowy graf
+                writer.WriteLine("Graf mniejszy nie jest pografem większego. Uzupełnienie grafu większego:");
+                var (expanded, newMatrix) = UllmanExpand.Expand(g1, g2, matrix);
+                expanded.PrintGraph(writer);
+                // Jakoś wydrukuj tą macierz
+
             }
         }
         if (options.approximate)

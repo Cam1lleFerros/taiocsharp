@@ -1,6 +1,4 @@
-﻿using SubgraphIsomorphism;
-
-namespace TAiO;
+﻿namespace SubgraphIsomorphism;
 
 public class Ullman
 {

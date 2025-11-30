@@ -1,6 +1,4 @@
-﻿using TAiO;
-
-namespace ConsoleApp1.Ullman;
+﻿namespace TAiO;
 
 public class Ullman
 {
@@ -14,8 +12,10 @@ public class Ullman
 
     public int Rows => p.size;
     public int Cols => g.size;
+    private int depth_record = 0;
+    private bool[,]? matrix_record = null;
 
-    public bool[,]? FindIsomorphism()
+    public (bool, bool[,]?) FindIsomorphism()
     {
         var mapping = new bool[Rows, Cols];
         var usedColumns = new bool[Cols];
@@ -33,23 +33,29 @@ public class Ullman
             }
         }
         if (!found)
-            return null;    
-        return Recurse(mapping, 0, usedColumns);
+            return (false, null);    
+        var res = Recurse(mapping, 0, usedColumns);
+        if (res != null)
+            return (true, res);
+        else
+            return (false, matrix_record);
     }
 
-    public bool[,]? Recurse(bool[,] mapping, int currentRow, bool[] usedColumns)
+    public bool[,]? Recurse(bool[,] mapping, int currentRow, bool[] usedColumns, int depth = 0)
     {
-        if (currentRow == Rows)
-            return IsValidMapping(mapping) ? mapping : null;
-
-        var mprim = new bool[Rows, Cols];
-        for (var i = 0; i < Rows; ++i)
+        if (depth > depth_record)
         {
-            for (var j = 0; j < Cols; ++j)
-                mprim[i, j] = mapping[i, j];
+            depth_record = depth;
+            matrix_record = (bool[,])mapping.Clone();
         }
-        Prune(mprim);
+        if (currentRow == Rows)
+        {
+            if (IsValidMapping(mapping))
+                return mapping;
+        }
 
+        var mprim = (bool[,])mapping.Clone();
+        Prune(mprim);
 
         for (var col = 0; col < Cols; ++col)
         {
@@ -58,7 +64,7 @@ public class Ullman
                 usedColumns[col] = true;
                 for (var i = 0; i < Cols; ++i)
                     mprim[currentRow, i] = i == col;
-                var result = Recurse(mprim, currentRow + 1, usedColumns);
+                var result = Recurse(mprim, currentRow + 1, usedColumns, depth + 1);
                 if (result != null)
                     return result;
                 mprim[currentRow, col] = false;

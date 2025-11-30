@@ -68,4 +68,15 @@ public class Graph
         }
         return degree;
     }
+
+    public int EdgeCount()
+    {
+        var sum = 0;
+        for (var i = 0; i < size; ++i)
+        {
+            for (var j = 0; j < size; ++j)
+                if (adjMatrix[i, j]) ++sum;
+        }
+        return sum;
+    }
 }

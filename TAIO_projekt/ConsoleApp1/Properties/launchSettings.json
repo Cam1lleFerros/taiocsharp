@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SubgraphIsomorphism": {
+      "commandName": "Project",
+      "commandLineArgs": "--exact"
+    }
+  }
+}

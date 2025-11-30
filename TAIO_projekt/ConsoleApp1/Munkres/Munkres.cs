@@ -1,4 +1,4 @@
-﻿namespace TAiO;
+﻿namespace SubgraphIsomorphism.Munkres;
 
 internal class Munkres
 {
@@ -134,8 +134,8 @@ internal class Munkres
             series.Add((starRow, primedCol));
         }
 
-        foreach (var p in series)
-            star[p.r, p.c] = !star[p.r, p.c];
+        foreach (var (r, c) in series)
+            star[r, c] = !star[r, c];
 
         for (var i = 0; i < x; ++i)
         {

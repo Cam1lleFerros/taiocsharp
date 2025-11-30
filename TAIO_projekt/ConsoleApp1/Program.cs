@@ -1,75 +1,25 @@
-﻿using System.Security.Cryptography.X509Certificates;
-using TAiO;
+﻿using NDesk.Options;
+using SubgraphIsomorphism.Munkres;
+using SubgraphIsomorphism;
+using SubgraphIsomorphism.Ullman;
 
 internal class Program
 {
-    public static void PrintMatrix(bool[,] matrix, System.IO.TextWriter writer)
-    {
-        var rows = matrix.GetLength(0);
-        var cols = matrix.GetLength(1);
-        for (var i = 0; i < rows; ++i)
-        {
-            for (var j = 0; j < cols; ++j)
-            {
-                writer.Write(matrix[i, j] ? "1 " : "0 ");
-            }
-            writer.WriteLine();
-        }
-    }
     private static void Main(string[] args)
     {
-        var (p, g) = Graph.ReadTwoFromFile("input.txt");
+        SIOptions options = new(args);
+        var (g1, g2) = Utils.PrepGraphs(options.inPath);
 
-        Graph g1, g2;
-        if (p.size > g.size)
-        {
-            g2 = p;
-            g1 = g;
-        }
-        else if (p.size == g.size)
-        {
-            if (p.EdgeCount() >= g.EdgeCount())
-            {
-                g1 = p;
-                g2 = g;
-            }
-            else
-            {
-                g1 = g;
-                g2 = p;
-            }
-        }
-        else
-        {
-            g2 = g;
-            g1 = p;
-        }
+        using var writer = File.CreateText(options.outPath);
 
-        bool exact = false; // Potrzebujemy jakoś to wczytywać na wejściu 
-                            // command line arguments i guess
-        if (args.Length == 1)
-        {
-            if(args[0] == "--inexact")
-            {
-                exact = false;
-            }
-            else
-            {
-                exact = true;
-            }
-        }
-
-
-        using var writer = File.CreateText("output.txt");
-
-        if (exact)
+        if (options.exact)
         {
             var ullman = new Ullman(g1, g2);
             var (result, matrix) = ullman.FindIsomorphism();
             if (result)
             {
                 writer.WriteLine("Graf mniejszy jest podgrafem większego. Dokładne mapowanie:");
-                PrintMatrix(matrix!, writer);
+                Utils.PrintMatrix(matrix!, writer);
                 // Jakoś wydrukuj tą macierz
             }
             else
@@ -78,9 +28,38 @@ internal class Program
                 // Wydrukuj nowy graf
             }
         }
-        else
+        if (options.approximate)
         {
-            ;
+            var res = MunkresUsage.FindMappingAndMissingEdges(g1, g2);
+            if (res.IsExact)
+            {
+                writer.WriteLine("Graf mniejszy jest podgrafem większego. Dokładne mapowanie:");
+            }
+            else
+            {
+                writer.WriteLine($"Graf mniejszy nie jest podgrafem większego. Liczba brakujących krawędzi do dodania: {res.MissingEdges}. Przybliżone mapowanie:");
+            }
+            var rows = g1.size;
+            var cols = g2.size;
+            var matrix = new bool[rows, cols];
+            for (var i = 0; i < rows; ++i)
+            {
+                var j = res.Mapping[i];
+                matrix[i, j] = true;
+            }
+            Utils.PrintMatrix(matrix, writer);
+            if (!res.IsExact)
+            {
+                writer.WriteLine("Graf po dodaniu brakujących krawędzi:");
+                for (var r = 0; r < res.Supergraph.size; ++r)
+                {
+                    for (var c = 0; c < res.Supergraph.size; ++c)
+                    {
+                        writer.Write(res.Supergraph.HasEdge(r, c) ? "1 " : "0 ");
+                    }
+                    writer.WriteLine();
+                }
+            }
         }
     }
 }

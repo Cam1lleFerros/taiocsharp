@@ -49,8 +49,14 @@ namespace SubgraphIsomorphism
             p.WriteOptionDescriptions(Console.Out);
         }
     }
+
     public static class Utils
     {
+        public const string ExactMatchMessage = "Graf mniejszy jest podgrafem większego.";
+        public const string ExactMappingDisplayMessage = "Dokładne mapowanie:";
+        public const string ExactMatchFailureMessage = "Graf mniejszy nie jest podgrafem większego.";
+        public const string GraphComplementDisplayMessage = "Graf po dodaniu brakujących krawędzi:";
+        public const string ApproximatedMappingDisplayMessage = "Przybliżone mapowanie:";
         public static void PrintMatrix(bool[,] matrix, System.IO.TextWriter writer)
         {
             var rows = matrix.GetLength(0);
@@ -65,6 +71,38 @@ namespace SubgraphIsomorphism
             }
         }
 
+        public static void PrintMatrix(int[,] matrix, System.IO.TextWriter writer)
+        {
+            var rows = matrix.GetLength(0);
+            var cols = matrix.GetLength(1);
+            for (var i = 0; i < rows; ++i)
+            {
+                for (var j = 0; j < cols; ++j)
+                {
+                    writer.Write(matrix[i, j] == 1? "1 " : "0 ");
+                }
+                writer.WriteLine();
+            }
+        }
+
+        public static void StandardizePrintMatrixOptions(int[] matrix, int g2size, System.IO.TextWriter writer, SIOptions options)
+        {
+            PrintMatrixOptions(StandardiseMapping(matrix, g2size), writer, options);
+        }
+
+        public static int[,] StandardiseMapping(int[] mapping, int g2size)
+        {
+            var standardisedMapping = new int[mapping.Length, g2size];
+            for (var i = 0; i < mapping.Length; ++i)
+            {
+                for(var j = 0; j < g2size; ++j)
+                {
+                    standardisedMapping[i, j] = (mapping[i] == j) ? 1 : 0;
+                }
+            }
+            return standardisedMapping;
+        }
+
         public static void PrintMatrix(bool[,] matrix)
         {
             var rows = matrix.GetLength(0);
@@ -77,6 +115,38 @@ namespace SubgraphIsomorphism
                 }
                 Console.WriteLine();
             }
+        }
+
+
+        public static void PrintMatrix(int[,] matrix)
+        {
+            var rows = matrix.GetLength(0);
+            var cols = matrix.GetLength(1);
+            for (var i = 0; i < rows; ++i)
+            {
+                for (var j = 0; j < cols; ++j)
+                {
+                    Console.Write(matrix[i, j] == 1 ? "1 " : "0 ");
+                }
+                Console.WriteLine();
+            }
+        }
+        public static void PrintMatrixOptions(bool[,] matrix, System.IO.TextWriter writer, SIOptions options)
+        {
+            PrintMatrix(matrix, writer);
+            if(options.console) PrintMatrix(matrix);
+        }
+
+        public static void PrintMatrixOptions(int[,] matrix, System.IO.TextWriter writer, SIOptions options)
+        {
+            PrintMatrix(matrix, writer);
+            if (options.console) PrintMatrix(matrix);
+        }
+
+        public static void PrintMessageOptions(string message, System.IO.TextWriter writer, SIOptions options)
+        {
+            writer.WriteLine(message);
+            if (options.console) Console.WriteLine(message);
         }
 
         public static (Graph p, Graph g) PrepGraphs(string inPath)

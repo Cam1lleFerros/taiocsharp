@@ -13,11 +13,7 @@ internal class Munkres
         var prime = new bool[x, y];
         var row_covered = new bool[x];
         var col_covered = new bool[y];
-        var z0_row = -1;
-        var z0_col = -1;
-        var emin = int.MaxValue;
-
-        
+        int emin;
         for (var i = 0; i < x; ++i)
         {
             var min = tab[i, 0];
@@ -28,7 +24,7 @@ internal class Munkres
                 tab[i, j] -= min;
         }
 
-        
+
         for (var j = 0; j < y; ++j)
         {
             var min = tab[0, j];
@@ -79,21 +75,22 @@ internal class Munkres
                 goto Step2;
         }
         goto Break;
-
     Step2:
-        
+
         emin = int.MaxValue;
 
+        int z0_row;
+        int z0_col;
         for (var i = 0; i < x; ++i)
         {
             for (var j = 0; j < y; ++j)
             {
-                
+
                 if (tab[i, j] == 0 && !col_covered[j] && !row_covered[i])
                 {
                     prime[i, j] = true;
 
-                   
+
                     var starColInRow = -1;
                     for (var c = 0; c < y; ++c)
                     {
@@ -106,22 +103,22 @@ internal class Munkres
 
                     if (starColInRow == -1)
                     {
-                        
+
                         z0_row = i;
                         z0_col = j;
                         goto Step3;
                     }
                     else
                     {
-                        
+
                         row_covered[i] = true;
                         col_covered[starColInRow] = false;
-                        
+
                         goto Step2;
                     }
                 }
 
-               
+
                 if (!col_covered[j] && !row_covered[i] && tab[i, j] < emin)
                     emin = tab[i, j];
             }
@@ -199,8 +196,6 @@ internal class Munkres
             }
         }
 
-
-        emin = int.MaxValue;
         goto Step2;
 
     Break:

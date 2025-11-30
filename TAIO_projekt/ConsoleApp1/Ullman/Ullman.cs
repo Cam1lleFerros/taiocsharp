@@ -1,14 +1,8 @@
 ﻿namespace SubgraphIsomorphism.Ullman;
 
-public class Ullman
+public class Ullman(Graph p, Graph g)
 {
-    public Graph g, p;
-
-    public Ullman(Graph p, Graph g)
-    {
-        this.g = g;
-        this.p = p;
-    }
+    public Graph g = g, p = p;
 
     public int Rows => p.size;
     public int Cols => g.size;

@@ -2,7 +2,7 @@
   "profiles": {
     "SubgraphIsomorphism": {
       "commandName": "Project",
-      "commandLineArgs": "--exact"
+      "commandLineArgs": "--approximate\r\n"
     }
   }
 }

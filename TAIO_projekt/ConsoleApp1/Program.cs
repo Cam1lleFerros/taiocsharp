@@ -3,6 +3,19 @@ using TAiO;
 
 internal class Program
 {
+    public static void PrintMatrix(bool[,] matrix, System.IO.TextWriter writer)
+    {
+        var rows = matrix.GetLength(0);
+        var cols = matrix.GetLength(1);
+        for (var i = 0; i < rows; ++i)
+        {
+            for (var j = 0; j < cols; ++j)
+            {
+                writer.Write(matrix[i, j] ? "1 " : "0 ");
+            }
+            writer.WriteLine();
+        }
+    }
     private static void Main(string[] args)
     {
         var (p, g) = Graph.ReadTwoFromFile("input.txt");
@@ -36,13 +49,13 @@ internal class Program
                             // command line arguments i guess
         if (args.Length == 1)
         {
-            if(args[0] == "--exact")
+            if(args[0] == "--inexact")
             {
-                exact = true;
+                exact = false;
             }
             else
             {
-                exact = false;
+                exact = true;
             }
         }
 
@@ -56,6 +69,7 @@ internal class Program
             if (result)
             {
                 writer.WriteLine("Graf mniejszy jest podgrafem większego. Dokładne mapowanie:");
+                PrintMatrix(matrix!, writer);
                 // Jakoś wydrukuj tą macierz
             }
             else

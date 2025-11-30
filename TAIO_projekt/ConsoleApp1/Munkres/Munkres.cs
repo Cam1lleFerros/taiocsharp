@@ -50,9 +50,9 @@ internal class Munkres
         for (var i = 0; i < x; ++i)
             row_covered[i] = false;
         Step1:
-        for (var i = 0; i < x; ++i)
+        for (var j = 0; j < y; ++j)
         {
-            for (var j = 0; j < y; ++j)
+            for (var i = 0; i < x; ++i)
             {
                 if (col_covered[j])
                     break;

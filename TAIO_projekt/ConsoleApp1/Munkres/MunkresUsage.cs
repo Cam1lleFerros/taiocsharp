@@ -8,14 +8,19 @@ namespace SubgraphIsomorphism.Munkres
     {
         public record MappingResult(int[] Mapping, int MissingEdges, bool IsExact, Graph Supergraph);
 
-        // Buduje macierz kosztów: wiersze = wierzcho³ki mniejszego grafu (s),
-        // kolumny = wierzcho³ki wiêkszego grafu (l).
-        // Koszt oparty jest na ró¿nicy stopni i ró¿nicy "s¹siednich stopni" (prosta sygnatura).
         public static int[,] BuildCostMatrix(Graph s, Graph l)
         {
             var m = s.size;
             var n = l.size;
-            var cost = new int[m, n];
+            var size = m + n;
+            var large = 1000000000; 
+            var cost = new int[size, size];
+
+
+            for (var i = 0; i < size; ++i)
+                for (var j = 0; j < size; ++j)
+                    cost[i, j] = large;
+
 
             for (var i = 0; i < m; ++i)
             {
@@ -33,16 +38,43 @@ namespace SubgraphIsomorphism.Munkres
                     for (var k = 0; k < len; ++k)
                         c += Math.Abs(sNbrDegrees[k] - lNbrDegrees[k]);
 
-                    // kara za ró¿nicê liczby s¹siadów
+
                     c += Math.Abs(sNbrDegrees.Length - lNbrDegrees.Length);
 
                     cost[i, j] = c;
                 }
             }
 
+
+            for (var i = 0; i < m; ++i)
+            {
+                cost[i, n + i] = DeletionCost(s, i);
+            }
+
+
+            for (var j = 0; j < n; ++j)
+            {
+                cost[m + j, j] = InsertionCost(l, j);
+            }
+
+
+            for (var i = 0; i < n; ++i)
+                for (var j = 0; j < m; ++j)
+                    cost[m + i, n + j] = 0;
+
             return cost;
         }
 
+        private static int DeletionCost(Graph g, int u)
+        {
+            return 1 + g.OutDegree(u);
+        }
+
+   
+        private static int InsertionCost(Graph g, int v)
+        {
+            return 1 + g.OutDegree(v);
+        }
 
         public static MappingResult FindMappingAndMissingEdges(Graph s, Graph l)
         {

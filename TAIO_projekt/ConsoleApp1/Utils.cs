@@ -27,10 +27,25 @@ namespace SubgraphIsomorphism
         };
             List<string> extra = opts.Parse(args);
 
+            if (help)
+            {
+                ShowHelp(opts);
+                Environment.Exit(0);
+            }
+
             if (!exact && !approximate)
             {
                 throw new ArgumentException("At least one of --exact or --approximate options must be specified.");
             }
+        }
+
+        static void ShowHelp(OptionSet p)
+        {
+            Console.WriteLine("Usage:");
+            Console.WriteLine("The program solves the Subgraph Isomorphism Problem with either the Ullman or Munkres algorithms.");
+            Console.WriteLine();
+            Console.WriteLine("The following options can be used:");
+            p.WriteOptionDescriptions(Console.Out);
         }
     }
     public static class Utils

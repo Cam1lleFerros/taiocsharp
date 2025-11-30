@@ -1,144 +1,119 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TAiO;
+﻿using TAiO;
 
-namespace ConsoleApp1.Ullman
+namespace ConsoleApp1.Ullman;
+
+public class Ullman
 {
-    public class Ullman
+    public Graph g, p;
+
+    public Ullman(Graph p, Graph g)
     {
-        public Graph g, p;
+        this.g = g;
+        this.p = p;
+    }
 
-        public Ullman(Graph p, Graph g)
+    public int Rows => p.size;
+    public int Cols => g.size;
+
+    public bool[,]? FindIsomorphism()
+    {
+        var mapping = new bool[Rows, Cols];
+        var usedColumns = new bool[Cols];
+        Array.Fill(usedColumns, false);
+        var found = false;
+        for (var i = 0; i < Rows; ++i)
         {
-            this.g = g;
-            this.p = p;
+            for (var j = 0; j < Cols; ++j)
+            {
+                if (p.OutDegree(i) <= g.OutDegree(j))
+                {
+                    mapping[i, j] = true;
+                    found = true;
+                }
+            }
         }
+        if (!found)
+            return null;    
+        return Recurse(mapping, 0, usedColumns);
+    }
 
-        public int rows => p.size;
-        public int cols => g.size;
+    public bool[,]? Recurse(bool[,] mapping, int currentRow, bool[] usedColumns)
+    {
+        if (currentRow == Rows)
+            return IsValidMapping(mapping) ? mapping : null;
 
-        public bool[,]? FindIsomorphism()
+        var mprim = new bool[Rows, Cols];
+        for (var i = 0; i < Rows; ++i)
         {
-            bool[,] mapping = new bool[rows, cols];
-            bool[] usedColumns = new bool[cols];
-            Array.Fill(usedColumns, false);
-            bool found = false;
-            for (int i = 0; i < rows; i++)
-            {
-                for (int j = 0; j < cols; j++)
-                {
-                    if (p.OutDegree(i) <= g.OutDegree(j))
-                    {
-                        mapping[i, j] = true;
-                        found = true;
-                    }
-                }
-            }
-            if(!found)
-                return null;    
-            return Recurse(mapping, 0, usedColumns);
+            for (var j = 0; j < Cols; ++j)
+                mprim[i, j] = mapping[i, j];
         }
+        Prune(mprim);
 
-        public bool[,]? Recurse(bool[,] mapping, int currentRow, bool[] usedColumns)
+
+        for (var col = 0; col < Cols; ++col)
         {
-            if(currentRow == rows)
+            if (!usedColumns[col])
             {
-                if (IsValidMapping(mapping))
-                {
-                    return mapping;
-                }
-                else
-                {
-                    return null;
-                }
+                usedColumns[col] = true;
+                for (var i = 0; i < Cols; ++i)
+                    mprim[currentRow, i] = i == col;
+                var result = Recurse(mprim, currentRow + 1, usedColumns);
+                if (result != null)
+                    return result;
+                mprim[currentRow, col] = false;
+                usedColumns[col] = false;
             }
-
-            bool[,] mprim = new bool[rows, cols];
-            for(int i = 0; i<rows; i++)
-            {
-                for(int j = 0; j < cols; j++)
-                {
-                    mprim[i, j] = mapping[i, j];
-                }
-                
-            }
-            Prune(mprim);
-
-
-            for (int col = 0; col < cols; col++)
-            {
-                if (!usedColumns[col])
-                {
-                    usedColumns[col] = true;
-                    for(int i = 0; i<cols; i++)
-                    {
-                        mprim[currentRow, i] = (i == col);
-                    }
-                    var result = Recurse(mprim, currentRow + 1, usedColumns);
-                    if (result != null)
-                    {
-                        return result;
-                    }
-                    mprim[currentRow, col] = false;
-                    usedColumns[col] = false;
-                }
-            }
-            return null;
         }
+        return null;
+    }
 
-        private void Prune(bool[,] mprim)
+    private void Prune(bool[,] mprim)
+    {
+        bool changed;
+        do
         {
-            bool changed;
-            do
+            changed = false;
+            for (var i = 0; i < Rows; ++i)
             {
-                changed = false;
-                for (int i = 0; i < rows; i++)
+                for (var j = 0; j < Cols; ++j)
                 {
-                    for(int j = 0; j < cols; j++)
+                    if (mprim[i, j])
                     {
-                        if (mprim[i, j])
+                        foreach (var np in p.OutNeighbours(i))
                         {
-                            foreach (var np in p.OutNeighbours(i))
+                            var hasMapping = false;
+                            foreach (var ng in g.OutNeighbours(j))
                             {
-                                bool hasMapping = false;
-                                foreach (var ng in g.OutNeighbours(j))
+                                if (mprim[np, ng])
                                 {
-                                    if (mprim[np, ng])
-                                    {
-                                        hasMapping = true;
-                                        break;
-                                    }
-                                }
-                                if (!hasMapping)
-                                {
-                                    mprim[i, j] = false;
-                                    changed = true;
+                                    hasMapping = true;
                                     break;
                                 }
+                            }
+                            if (!hasMapping)
+                            {
+                                mprim[i, j] = false;
+                                changed = true;
+                                break;
                             }
                         }
                     }
                 }
-            } while (changed);
-        }
-
-        private bool IsValidMapping(bool[,] mapping)
-        {
-            int sum;
-            for(int i = 0; i<rows; i++)
-            {
-                sum = 0;
-                for (int j = 0; j < cols; j++)
-                {
-                    sum += (mapping[i, j] ? 1 : 0);
-                }
-                if (sum != 1) return false;
             }
-            return true;
+        } while (changed);
+    }
+
+    private bool IsValidMapping(bool[,] mapping)
+    {
+        for (var i = 0; i < Rows; ++i)
+        {
+            var sum = 0;
+            for (var j = 0; j < Cols; ++j)
+                sum += mapping[i, j] ? 1 : 0;
+            if (sum != 1) 
+                return false;
         }
+        return true;
     }
 }

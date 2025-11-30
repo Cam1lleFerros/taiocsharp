@@ -10,19 +10,20 @@ namespace SubgraphIsomorphism
     public class SIOptions
     {
         public string inPath = "input.txt";
-        public string outPath = "output.txt";
+        public string? outPath = "output.txt";
         public bool help = false;
         public bool exact = false;
         public bool approximate = false;
-
+        public bool console = false;
 
         public SIOptions(string[] args)
         {
             var opts = new OptionSet() {
             { "input=", "specify input file (default: input.txt)", v => inPath = v },
-            { "output=", "specify output file (default: output.txt)", v => outPath = v },
+            { "output=", "specify output file (default: output.txt)", v => {outPath = v; } },
             { "e|exact", "run the exact algorithm (Ullman)", v => { exact = true; } },
             { "a|approximate", "run the exact algorithm (Munkres modification)" ,v => { approximate = true; } },
+            { "c|console", "print results to command line", v => console = true},
             { "h|?|help", "show help",  v => help = v != null },
         };
             List<string> extra = opts.Parse(args);
@@ -61,6 +62,20 @@ namespace SubgraphIsomorphism
                     writer.Write(matrix[i, j] ? "1 " : "0 ");
                 }
                 writer.WriteLine();
+            }
+        }
+
+        public static void PrintMatrix(bool[,] matrix)
+        {
+            var rows = matrix.GetLength(0);
+            var cols = matrix.GetLength(1);
+            for (var i = 0; i < rows; ++i)
+            {
+                for (var j = 0; j < cols; ++j)
+                {
+                    Console.Write(matrix[i, j] ? "1 " : "0 ");
+                }
+                Console.WriteLine();
             }
         }
 

@@ -1,4 +1,4 @@
-﻿namespace TAiO;
+﻿namespace SubgraphIsomorphism.Ullman;
 
 public class UllmanExpand
 {

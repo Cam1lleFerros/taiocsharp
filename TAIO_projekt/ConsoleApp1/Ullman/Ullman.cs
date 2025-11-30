@@ -1,6 +1,4 @@
-﻿using SubgraphIsomorphism;
-
-namespace TAiO;
+﻿namespace SubgraphIsomorphism.Ullman;
 
 public class Ullman
 {
@@ -80,7 +78,7 @@ public class Ullman
 
                 var newMapping = (bool[,])mprim.Clone();
                 for (var i = 0; i < Cols; ++i)
-                    newMapping[currentRow, i] = (i == col);
+                    newMapping[currentRow, i] = i == col;
 
                 var result = Recurse(newMapping, currentRow + 1, usedColumns, depth + 1);
                 if (result != null)

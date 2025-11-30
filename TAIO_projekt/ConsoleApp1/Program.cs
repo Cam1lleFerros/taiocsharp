@@ -1,5 +1,4 @@
-﻿using NDesk.Options;
-using SubgraphIsomorphism.Munkres;
+﻿using SubgraphIsomorphism.Munkres;
 using SubgraphIsomorphism;
 using SubgraphIsomorphism.Ullman;
 
@@ -9,6 +8,7 @@ internal class Program
     {
         SIOptions options = new(args);
         var (g1, g2) = Utils.PrepGraphs(options.inPath);
+
 
         using var writer = File.CreateText(options.outPath);
 
@@ -20,12 +20,46 @@ internal class Program
             {
                 writer.WriteLine("Graf mniejszy jest podgrafem większego. Dokładne mapowanie:");
                 Utils.PrintMatrix(matrix!, writer);
-                // Jakoś wydrukuj tą macierz
+                if (options.console)
+                {
+                    Console.WriteLine("Graf mniejszy jest podgrafem większego. Dokładne mapowanie:");
+                    Utils.PrintMatrix(matrix!);
+                }
             }
             else
             {
                 // Wywował metodę extend z Ullmana
                 // Wydrukuj nowy graf
+                var (expandedG2, workingMapping) = UllmanExpand.Expand(g1, g2, matrix); 
+                writer.WriteLine("Graf mniejszy nie jest podgrafem większego.");
+                   
+                writer.WriteLine("Graf po dodaniu brakujących krawędzi:");
+                for (var r = 0; r < expandedG2.size; ++r)
+                {
+                    for (var c = 0; c < expandedG2.size; ++c)
+                    {
+                        writer.Write(expandedG2.HasEdge(r, c) ? "1 " : "0 ");
+                    }
+                    writer.WriteLine();
+                }
+                writer.WriteLine("Przybliżone mapowanie:");
+                Utils.PrintMatrix(workingMapping!, writer);
+                if (options.console)
+                {
+                    Console.WriteLine("Graf mniejszy nie jest podgrafem większego.");
+                    Console.WriteLine("Graf po dodaniu brakujących krawędzi:");
+                    for (var r = 0; r < expandedG2.size; ++r)
+                    {
+                        for (var c = 0; c < expandedG2.size; ++c)
+                        {
+                            Console.Write(expandedG2.HasEdge(r, c) ? "1 " : "0 ");
+                        }
+                        Console.WriteLine();
+                    }
+                    Console.WriteLine("Przybliżone mapowanie:");
+                    Utils.PrintMatrix(workingMapping!);
+                }
+
             }
         }
         if (options.approximate)
@@ -34,10 +68,18 @@ internal class Program
             if (res.IsExact)
             {
                 writer.WriteLine("Graf mniejszy jest podgrafem większego. Dokładne mapowanie:");
+                if (options.console)
+                {
+                    Console.WriteLine("Graf mniejszy jest podgrafem większego. Dokładne mapowanie:");
+                }
             }
             else
             {
                 writer.WriteLine($"Graf mniejszy nie jest podgrafem większego. Liczba brakujących krawędzi do dodania: {res.MissingEdges}. Przybliżone mapowanie:");
+                if (options.console)
+                {
+                    Console.WriteLine($"Graf mniejszy nie jest podgrafem większego. Liczba brakujących krawędzi do dodania: {res.MissingEdges}. Przybliżone mapowanie:");
+                }
             }
             var rows = g1.size;
             var cols = g2.size;
@@ -48,8 +90,13 @@ internal class Program
                 matrix[i, j] = true;
             }
             Utils.PrintMatrix(matrix, writer);
+            if (options.console)
+            {
+                Utils.PrintMatrix(matrix);
+            }
             if (!res.IsExact)
             {
+
                 writer.WriteLine("Graf po dodaniu brakujących krawędzi:");
                 for (var r = 0; r < res.Supergraph.size; ++r)
                 {
@@ -58,6 +105,11 @@ internal class Program
                         writer.Write(res.Supergraph.HasEdge(r, c) ? "1 " : "0 ");
                     }
                     writer.WriteLine();
+                }
+                if (options.console)
+                {
+                    Console.WriteLine("Graf po dodaniu brakujących krawędzi:");
+                    Utils.PrintMatrix(matrix);
                 }
             }
         }

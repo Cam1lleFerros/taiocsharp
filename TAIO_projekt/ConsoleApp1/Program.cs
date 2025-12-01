@@ -7,6 +7,6 @@ internal class Program
     private static void Main(string[] args)
     {
         SolverManager manager = new(args);
-        manager.SolveAll();
+        manager.SolveOptions();
     }
 }

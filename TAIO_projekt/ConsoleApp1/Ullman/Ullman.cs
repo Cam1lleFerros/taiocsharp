@@ -49,17 +49,16 @@ public class Ullman(Graph p, Graph g)
 
     public bool[,]? Recurse(bool[,] mapping, int currentRow, bool[] usedColumns, int depth = 0)
     {
-        if (depth > deepestMatch)
-        {
-            deepestMatch = depth;
-            bestMatch = (bool[,])mapping.Clone();
-        }
-
         if (currentRow == Rows)
         {
             if (IsValidMapping(mapping))
                 return mapping;
             return null;
+        }
+        if (depth > deepestMatch)
+        {
+            deepestMatch = depth;
+            bestMatch = (bool[,])mapping.Clone();
         }
 
         var mprim = (bool[,])mapping.Clone();

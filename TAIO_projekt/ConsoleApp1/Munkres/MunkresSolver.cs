@@ -99,7 +99,7 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
     private static double NodeDeletionCost(Graph pattern, int node) => 1 + pattern.OutDegree(node);
 
     private static double NodeInsertionCost(Graph target, int node) => 1 + target.OutDegree(node);
-   
+
     public static MappingResult ComputeEditDistance(Graph pattern, Graph target)
     {
         try

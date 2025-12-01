@@ -38,7 +38,7 @@ public class Graph(int n)
 
     public bool HasEdge(int a, int b)
     {
-        if (a < 0 || b < 0 || a >= size || b >= size) 
+        if (a < 0 || b < 0 || a >= size || b >= size)
             throw new IndexOutOfRangeException($"Vertex indexes must be in range [0;n). Arguments given: {a}, {b}");
 
         return adjMatrix[a, b];
@@ -46,7 +46,7 @@ public class Graph(int n)
 
     public IEnumerable<int> OutNeighbours(int a)
     {
-        for (var i = 0; i< size; ++i)
+        for (var i = 0; i < size; ++i)
         {
             if (i != a && adjMatrix[a, i])
                 yield return i;

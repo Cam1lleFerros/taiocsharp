@@ -182,7 +182,7 @@ public class UllmanSolver : ISubgraphIsomorphismSolver
     {
         for (var j = 0; j < colCount; ++j)
         {
-            if (matrixRecord[row, j]) 
+            if (matrixRecord[row, j])
                 return false;
         }
         return true;
@@ -192,7 +192,7 @@ public class UllmanSolver : ISubgraphIsomorphismSolver
     {
         for (var i = 0; i < rowCount; ++i)
         {
-            if (matrixRecord[i, col]) 
+            if (matrixRecord[i, col])
                 return false;
         }
         return true;

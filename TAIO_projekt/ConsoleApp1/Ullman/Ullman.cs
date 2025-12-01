@@ -1,4 +1,5 @@
-﻿namespace SubgraphIsomorphism.Ullman;
+﻿using SubgraphIsomorphism.Utils;
+namespace SubgraphIsomorphism.Ullman;
 
 public class Ullman(Graph p, Graph g)
 {

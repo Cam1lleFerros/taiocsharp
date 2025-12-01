@@ -1,6 +1,7 @@
 ﻿using SubgraphIsomorphism.Munkres;
 using SubgraphIsomorphism.Ullman;
 using System.Diagnostics;
+using System.Linq;
 
 namespace SubgraphIsomorphism.Utils
 {
@@ -67,12 +68,19 @@ namespace SubgraphIsomorphism.Utils
         public void SolveAllBatch()
         {
             var inputFiles = Directory.GetFiles(options.inDirectory, "*.txt");
+            inputFiles = [.. (from f in inputFiles
+                             where !f.EndsWith("_mapping.txt")
+                          select f)];
+            int inputCount = inputFiles.Length;
+            int processedCount = 0;
             var logPath = Path.Combine(options.outDirectory, "batch_log.txt");
             using var logWriter = new StreamWriter(logPath, append: true);
+            //ConsoleUtils.WriteProgressBar(0);
+            //ConsoleUtils.WriteProgress(0);
+            var timer = new Stopwatch();
             foreach (var inputFile in inputFiles)
             {
-                if(inputFile.EndsWith("_mapping.txt"))
-                    continue;
+                timer.Restart();
                 var (g1, g2) = PrintGraphUtils.PrepGraphs(inputFile);
                 var outputFileName = Path.GetFileName(inputFile);
                 outputFileName = outputFileName.Replace(".txt", "_out.txt");
@@ -81,6 +89,12 @@ namespace SubgraphIsomorphism.Utils
                 {
                     Solve(g1, g2, i, outPath, logWriter);
                 }
+                processedCount++;
+                timer.Stop();
+                var infoString = $"Processed {processedCount} out of {inputCount} files.";
+                Console.Write(infoString);
+                
+                Console.Write(ConsoleUtils.PrepareDeletionString(infoString.Length));
             }
         }
 

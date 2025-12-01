@@ -9,6 +9,7 @@ namespace SubgraphIsomorphism.Utils
         public string outPath = "output.txt";
         public string inDirectory = "";
         public string outDirectory = "";
+        public string seedPath = "";
         public bool help = false;
         public bool exact = false;
         public bool approximate = false;
@@ -16,6 +17,7 @@ namespace SubgraphIsomorphism.Utils
         public bool append = false;
         public bool generate = false;
         public bool verbose = false;
+        public bool clean = false;
 
         public SIOptions(string[] args)
         {
@@ -24,17 +26,26 @@ namespace SubgraphIsomorphism.Utils
             { "output=", "specify output file (default: output.txt)", v => {outPath = v; } },
             { "inputDir=", "specify input directory for batch solving", v => inDirectory = v },
             { "outputDir=", "specify output directory for batch solving", v => outDirectory = v },
+            { "seed=", "seed file for input generation. A seed file needs to contain five values, separated with spaces: target size, pattern size minimum and maximum, pattern step, and edge probability", v => seedPath = v },
             { "g|generate", "Generate random inputs for the program in outputDir, then exit the program without solving.", v =>  {generate = true; }},
             { "e|exact", "run the exact algorithm (Ullman)", v => { exact = true; } },
-            { "a|approximate", "run the exact algorithm (Munkres modification)" ,v => { approximate = true; } },
+            { "a|approximate", "run the approximate algorithm (Munkres modification)" ,v => { approximate = true; } },
             { "c|console", "print results to command line", v => console = true},
             { "p|append", "append results to output file if it already exists", v => append = true },
             { "v|verbose", "write processing time into output file", v => verbose = true },
+            { "l|clean", "clean input directory before generating", v => clean = true },
             { "h|?|help", "show help",  v => help = v != null },
+
         };
             List<string> extra = opts.Parse(args);
 
-            if(generate)
+            if (help)
+            {
+                ShowHelp(opts);
+                Environment.Exit(0);
+            }
+
+            if (generate)
             {
                 if( (exact || approximate || inDirectory != "") )
                 {
@@ -46,16 +57,36 @@ namespace SubgraphIsomorphism.Utils
                     throw new ArgumentException("The --generate option requires the --outputDir option to specify where to save generated inputs.");
                 }
 
-                InputGenerator.InputGenerator.GenerateInputsForSize(outDirectory, 10, 1, 9);
+                if(clean && Directory.Exists(outDirectory))
+                {
+                    Directory.Delete(outDirectory, true);
+                    Directory.CreateDirectory(outDirectory);
+                }
+
+                if (seedPath != "")
+                {
+                    var seedContent = File.ReadAllText(seedPath).Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    if (seedContent.Length != 5)
+                    {
+                        throw new ArgumentException("Seed file must contain exactly five values: target size, pattern size minimum and maximum, pattern step, and edge probability.");
+                    }
+                    int targetSize = int.Parse(seedContent[0]);
+                    int patternSizeMin = int.Parse(seedContent[1]);
+                    int patternSizeMax = int.Parse(seedContent[2]);
+                    int patternStep = int.Parse(seedContent[3]);
+                    double edgeProbability = double.Parse(seedContent[4]);
+                    InputGenerator.InputGenerator.GenerateInputsForSize(outDirectory, targetSize, patternSizeMin, patternSizeMax, patternStep, edgeProbability);
+                }
+                else
+                {
+                    InputGenerator.InputGenerator.GenerateInputsForSize(outDirectory, 10, 1, 9, 1); 
+                }
+                Console.WriteLine("Input generation completed.");
                 Environment.Exit(0);
             }
 
 
-            if (help)
-            {
-                ShowHelp(opts);
-                Environment.Exit(0);
-            }
+            
 
             if (!exact && !approximate)
             {

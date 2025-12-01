@@ -8,9 +8,9 @@ namespace SubgraphIsomorphism.InputGenerator
 {
     public class InputGenerator
     {
-        public static void GenerateInputsForSize(string directoryPath, int targetSize=100, int startPatternSize=10, int endPatternSize = 99, double edgeProbability = 0.5)
+        public static void GenerateInputsForSize(string directoryPath, int targetSize=100, int startPatternSize=10, int endPatternSize = 99, int patternStep = 1, double edgeProbability = 0.5)
         {
-            for (int patternSize = startPatternSize; patternSize <= endPatternSize; patternSize++)
+            for (int patternSize = startPatternSize; patternSize <= endPatternSize; patternSize+=patternStep)
             {
                 string path = Path.Combine(directoryPath, $"input_pattern{patternSize}_target{targetSize}.txt");
                 GenerateRandomInput(path, patternSize, targetSize, edgeProbability);

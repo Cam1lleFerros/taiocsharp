@@ -121,6 +121,7 @@ namespace SubgraphIsomorphism.Utils
 
             var solver = solvers[idx];
             var results = solver.Solve(g1, g2);
+            outPath = outPath.Replace(".txt", $"_{solver.Name()}.txt");
             using var writer = new StreamWriter(outPath, append: options.append);
             PrintGraphUtils.PrintMessageOptions($"--- Results for {solver.Name()} solver ---", writer, options);
             if (results.IsExact)

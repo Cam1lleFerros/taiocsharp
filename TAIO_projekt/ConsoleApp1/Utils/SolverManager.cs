@@ -67,6 +67,8 @@ namespace SubgraphIsomorphism.Utils
         public void SolveAllBatch()
         {
             var inputFiles = Directory.GetFiles(options.inDirectory, "*.txt");
+            var logPath = Path.Combine(options.outDirectory, "batch_log.txt");
+            using var logWriter = new StreamWriter(logPath, append: true);
             foreach (var inputFile in inputFiles)
             {
                 if(inputFile.EndsWith("_mapping.txt"))
@@ -77,7 +79,7 @@ namespace SubgraphIsomorphism.Utils
                 var outPath = Path.Combine(options.outDirectory, outputFileName);
                 for (var i = 0; i < solvers.Count; ++i)
                 {
-                    Solve(g1, g2, i, outPath);
+                    Solve(g1, g2, i, outPath, logWriter);
                 }
             }
         }
@@ -110,7 +112,7 @@ namespace SubgraphIsomorphism.Utils
             }
         }
 
-        public void Solve(Graph g1, Graph g2, int idx = 0, string outPath = "")
+        public void Solve(Graph g1, Graph g2, int idx = 0, string outPath = "", StreamWriter? logWriter = null)
         {
             if(outPath == "")
             {
@@ -127,6 +129,7 @@ namespace SubgraphIsomorphism.Utils
             timer.Stop();
             outPath = outPath.Replace(".txt", $"_{solver.Name()}.txt");
             using var writer = new StreamWriter(outPath, append: options.append);
+            logWriter?.WriteLine($"{solver.Name()}; {g1.size}; {g2.size}; {timer.ElapsedMilliseconds}");
             PrintGraphUtils.PrintMessageOptions($"--- Results for {solver.Name()} solver ---", writer, options);
             if(options.verbose)
             {

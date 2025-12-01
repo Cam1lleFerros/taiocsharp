@@ -1,8 +1,7 @@
 {
   "profiles": {
     "SubgraphIsomorphism": {
-      "commandName": "Project",
-      "commandLineArgs": "--approximate\r\n"
+      "commandName": "Project"
     }
   }
 }

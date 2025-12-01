@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace SubgraphIsomorphism.Munkres;
 
-namespace SubgraphIsomorphism.Munkres;
-
-internal class Munkres
+public class Munkres
 {
     public static (bool[,], int[,]) Muknres(int[,] tab)
     {

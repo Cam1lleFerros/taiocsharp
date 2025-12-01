@@ -6,7 +6,7 @@ public class UllmanExpand
     {
         matrixRecord ??= FindBestMapping(g1, g2);
 
-        bool[,] workingMapping = (bool[,])matrixRecord.Clone();
+        var workingMapping = (bool[,])matrixRecord.Clone();
 
         CompleteMapping(g1, g2, workingMapping);
 

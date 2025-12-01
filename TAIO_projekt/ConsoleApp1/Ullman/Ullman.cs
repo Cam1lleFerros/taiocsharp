@@ -4,8 +4,8 @@ public class Ullman(Graph p, Graph g)
 {
     public Graph g = g, p = p;
 
-    public int Rows => p.size;
-    public int Cols => g.size;
+    private int Rows => p.size;
+    private int Cols => g.size;
     private int deepestMatch = 0;
     private bool[,]? bestMatch = null;
 
@@ -96,7 +96,6 @@ public class Ullman(Graph p, Graph g)
                 {
                     if (mprim[i, j])
                     {
-                        // Check outgoing edges
                         foreach (var np in p.OutNeighbours(i))
                         {
                             var hasMapping = false;

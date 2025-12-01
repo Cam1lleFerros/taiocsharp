@@ -15,6 +15,7 @@ namespace SubgraphIsomorphism.Utils
         public bool console = false;
         public bool append = false;
         public bool generate = false;
+        public bool verbose = false;
 
         public SIOptions(string[] args)
         {
@@ -28,6 +29,7 @@ namespace SubgraphIsomorphism.Utils
             { "a|approximate", "run the exact algorithm (Munkres modification)" ,v => { approximate = true; } },
             { "c|console", "print results to command line", v => console = true},
             { "p|append", "append results to output file if it already exists", v => append = true },
+            { "v|verbose", "write processing time into output file", v => verbose = true },
             { "h|?|help", "show help",  v => help = v != null },
         };
             List<string> extra = opts.Parse(args);

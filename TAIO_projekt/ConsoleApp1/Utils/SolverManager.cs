@@ -1,5 +1,6 @@
 ﻿using SubgraphIsomorphism.Munkres;
 using SubgraphIsomorphism.Ullman;
+using System.Diagnostics;
 
 namespace SubgraphIsomorphism.Utils
 {
@@ -120,10 +121,17 @@ namespace SubgraphIsomorphism.Utils
                 return;
 
             var solver = solvers[idx];
+            var timer = new Stopwatch();
+            timer.Start();
             var results = solver.Solve(g1, g2);
+            timer.Stop();
             outPath = outPath.Replace(".txt", $"_{solver.Name()}.txt");
             using var writer = new StreamWriter(outPath, append: options.append);
             PrintGraphUtils.PrintMessageOptions($"--- Results for {solver.Name()} solver ---", writer, options);
+            if(options.verbose)
+            {
+                PrintGraphUtils.PrintMessageOptions($"Processing time: {timer.ElapsedMilliseconds} ms", writer, options);
+            }
             if (results.IsExact)
             {
                 PrintGraphUtils.PrintMessageOptions(PrintGraphUtils.ExactMatchMessage, writer, options);

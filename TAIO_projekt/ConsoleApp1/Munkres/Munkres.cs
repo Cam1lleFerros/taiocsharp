@@ -2,200 +2,248 @@
 
 public class Munkres
 {
-    public static (bool[,], int[,]) Muknres(int[,] tab)
+    public static (bool[,] assignment, double totalCost) Solve(double[,] costMatrix)
     {
-        var x = tab.GetLength(0);
-        var y = tab.GetLength(1);
-        var star = new bool[x, y];
-        var prime = new bool[x, y];
-        var row_covered = new bool[x];
-        var col_covered = new bool[y];
-        int emin;
-        for (var i = 0; i < x; ++i)
+        var n = costMatrix.GetLength(0);
+        var cost = (double[,])costMatrix.Clone();
+
+        for (var i = 0; i < n; i++)
         {
-            var min = tab[i, 0];
-            for (var j = 1; j < y; ++j)
-                if (tab[i, j] < min)
-                    min = tab[i, j];
-            for (var j = 0; j < y; ++j)
-                tab[i, j] -= min;
+            double min = cost[i, 0];
+            for (var j = 1; j < n; j++)
+                if (cost[i, j] < min) min = cost[i, j];
+            for (var j = 0; j < n; j++)
+                cost[i, j] -= min;
         }
 
-
-        for (var j = 0; j < y; ++j)
+        for (var j = 0; j < n; j++)
         {
-            var min = tab[0, j];
-            for (var i = 1; i < x; ++i)
-                if (tab[i, j] < min)
-                    min = tab[i, j];
-            for (var i = 0; i < x; ++i)
-                tab[i, j] -= min;
+            double min = cost[0, j];
+            for (var i = 1; i < n; i++)
+                if (cost[i, j] < min) min = cost[i, j];
+            for (var i = 0; i < n; i++)
+                cost[i, j] -= min;
         }
 
-        
-        for (var i = 0; i < x; ++i)
+        return RunHungarianAlgorithm(cost, costMatrix);
+    }
+
+    private static (bool[,] assignment, double totalCost) RunHungarianAlgorithm(double[,] cost, double[,] originalCost)
+    {
+        var n = cost.GetLength(0);
+        var starred = new bool[n, n];
+        var primeMarks = new bool[n, n];
+        var rowCovered = new bool[n];
+        var colCovered = new bool[n];
+        var maxIterations = n * n * 10;
+        var iterations = 0;
+
+        for (var i = 0; i < n; i++)
         {
-            for (var j = 0; j < y; ++j)
+            for (var j = 0; j < n; j++)
             {
-                if (tab[i, j] == 0 && !row_covered[i] && !col_covered[j])       
+                if (IsZero(cost[i, j]) && !rowCovered[i] && !colCovered[j])
                 {
-                    star[i, j] = true;
-                    row_covered[i] = true;
-                    col_covered[j] = true;
+                    starred[i, j] = true;
+                    rowCovered[i] = true;
+                    colCovered[j] = true;
                 }
             }
         }
 
-       
-        for (var i = 0; i < x; ++i)
-            row_covered[i] = false;
+        ClearCovers(rowCovered, colCovered);
 
-    Step1:
-        
-        for (var j = 0; j < y; ++j)
+        while (iterations++ < maxIterations)
         {
-            col_covered[j] = false;
-            for (var i = 0; i < x; ++i)
+            int coveredColumns = CoverStarredColumns(starred, colCovered);
+
+            if (coveredColumns == n)
+                break;
+
+            while (true)
             {
-                if (star[i, j])
+                var (zeroRow, zeroCol) = FindUncoveredZero(cost, rowCovered, colCovered);
+
+                if (zeroRow == -1)
                 {
-                    col_covered[j] = true;
+                    AdjustMatrix(cost, rowCovered, colCovered);
+                    (zeroRow, zeroCol) = FindUncoveredZero(cost, rowCovered, colCovered);
+
+                    if (zeroRow == -1)
+                        break;
+                }
+
+                primeMarks[zeroRow, zeroCol] = true;
+
+                var starCol = FindStarInRow(starred, zeroRow);
+
+                if (starCol == -1)
+                {
+                    AugmentPath(starred, primeMarks, zeroRow, zeroCol);
+                    ClearCovers(rowCovered, colCovered);
+                    ClearPrimes(primeMarks);
+                    break;
+                }
+                else
+                {
+                    rowCovered[zeroRow] = true;
+                    colCovered[starCol] = false;
+                }
+            }
+        }
+
+        double totalCost = 0;
+        for (var i = 0; i < n; i++)
+            for (var j = 0; j < n; j++)
+                if (starred[i, j])
+                    totalCost += originalCost[i, j];
+
+        return (starred, totalCost);
+    }
+
+    private static bool IsZero(double value, double tolerance = 1e-10) => Math.Abs(value) < tolerance;
+
+    private static void ClearCovers(bool[] rowCovered, bool[] colCovered)
+    {
+        Array.Fill(rowCovered, false);
+        Array.Fill(colCovered, false);
+    }
+
+    private static void ClearPrimes(bool[,] primeMarks)
+    {
+        int n = primeMarks.GetLength(0);
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                primeMarks[i, j] = false;
+    }
+
+    private static int CoverStarredColumns(bool[,] starred, bool[] colCovered)
+    {
+        int n = starred.GetLength(0);
+        int coveredCount = 0;
+
+        for (int j = 0; j < n; j++)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                if (starred[i, j])
+                {
+                    colCovered[j] = true;
+                    coveredCount++;
                     break;
                 }
             }
         }
 
-       
-        for (var j = 0; j < y; ++j)
-        {
-            if (!col_covered[j])
-                goto Step2;
-        }
-        goto Break;
-    Step2:
+        return coveredCount;
+    }
 
-        emin = int.MaxValue;
-
-        int z0_row;
-        int z0_col;
-        for (var i = 0; i < x; ++i)
+    private static (int row, int col) FindUncoveredZero(double[,] cost, bool[] rowCovered, bool[] colCovered)
+    {
+        int n = cost.GetLength(0);
+        for (int i = 0; i < n; i++)
         {
-            for (var j = 0; j < y; ++j)
+            if (rowCovered[i]) continue;
+            for (int j = 0; j < n; j++)
             {
+                if (colCovered[j]) continue;
+                if (IsZero(cost[i, j]))
+                    return (i, j);
+            }
+        }
+        return (-1, -1);
+    }
 
-                if (tab[i, j] == 0 && !col_covered[j] && !row_covered[i])
-                {
-                    prime[i, j] = true;
+    private static int FindStarInRow(bool[,] starred, int row)
+    {
+        int n = starred.GetLength(1);
+        for (int j = 0; j < n; j++)
+            if (starred[row, j])
+                return j;
+        return -1;
+    }
 
+    private static int FindStarInColumn(bool[,] starred, int col)
+    {
+        int n = starred.GetLength(0);
+        for (int i = 0; i < n; i++)
+            if (starred[i, col])
+                return i;
+        return -1;
+    }
 
-                    var starColInRow = -1;
-                    for (var c = 0; c < y; ++c)
-                    {
-                        if (star[i, c])
-                        {
-                            starColInRow = c;
-                            break;
-                        }
-                    }
+    private static void AdjustMatrix(double[,] cost, bool[] rowCovered, bool[] colCovered)
+    {
+        int n = cost.GetLength(0);
 
-                    if (starColInRow == -1)
-                    {
-
-                        z0_row = i;
-                        z0_col = j;
-                        goto Step3;
-                    }
-                    else
-                    {
-
-                        row_covered[i] = true;
-                        col_covered[starColInRow] = false;
-
-                        goto Step2;
-                    }
-                }
-
-
-                if (!col_covered[j] && !row_covered[i] && tab[i, j] < emin)
-                    emin = tab[i, j];
+        double minVal = double.MaxValue;
+        for (int i = 0; i < n; i++)
+        {
+            if (rowCovered[i]) continue;
+            for (int j = 0; j < n; j++)
+            {
+                if (colCovered[j]) continue;
+                if (cost[i, j] < minVal)
+                    minVal = cost[i, j];
             }
         }
 
-        goto Step4;
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                if (rowCovered[i])
+                    cost[i, j] += minVal;
+                if (!colCovered[j])
+                    cost[i, j] -= minVal;
+            }
+        }
+    }
 
-    Step3:
-        var series = new List<(int r, int c)>();
-        if (z0_row < 0 || z0_col < 0)
-            goto Step1;
+    private static void AugmentPath(bool[,] starred, bool[,] primeMarks, int startRow, int startCol)
+    {
+        var path = new List<(int, int)>
+        {
+            (startRow, startCol)
+        };
 
-        series.Add((z0_row, z0_col));
+        var lookingInRow = false;
 
         while (true)
         {
-            var lastCol = series[^1].c;
-            var starRow = -1;
-            for (var r = 0; r < x; ++r)
+            if (!lookingInRow)
             {
-                if (star[r, lastCol])
-                {
-                    starRow = r;
+                var lastCol = path[^1].Item2;
+                var starRow = FindStarInColumn(starred, lastCol);
+
+                if (starRow == -1)
                     break;
-                }
+
+                path.Add((starRow, lastCol));
+                lookingInRow = true;
             }
-
-            if (starRow == -1)
-                break;
-
-            series.Add((starRow, lastCol));
-
-            var primedCol = -1;
-            for (var c = 0; c < y; ++c)
+            else
             {
-                if (prime[starRow, c])
+                var lastRow = path[^1].Item1;
+                var primeCol = -1;
+                for (int j = 0; j < primeMarks.GetLength(1); j++)
                 {
-                    primedCol = c;
-                    break;
+                    if (primeMarks[lastRow, j])
+                    {
+                        primeCol = j;
+                        break;
+                    }
                 }
-            }
 
-            if (primedCol == -1)
-                break;
+                if (primeCol == -1)
+                    break;
 
-            series.Add((starRow, primedCol));
-        }
-
-
-        foreach (var (r, c) in series)
-            star[r, c] = !star[r, c];
-
-
-        for (var i = 0; i < x; ++i)
-            for (var j = 0; j < y; ++j)
-                prime[i, j] = false;
-
-
-        for (var i = 0; i < x; ++i) row_covered[i] = false;
-        for (var j = 0; j < y; ++j) col_covered[j] = false;
-
-
-        goto Step1;
-
-    Step4:
-
-        for (var i = 0; i < x; ++i)
-        {
-            for (var j = 0; j < y; ++j)
-            {
-                if (row_covered[i])
-                    tab[i, j] += emin;
-                if (!col_covered[j])
-                    tab[i, j] -= emin;
+                path.Add((lastRow, primeCol));
+                lookingInRow = false;
             }
         }
 
-        goto Step2;
-
-    Break:
-        return (star, tab);
+        foreach (var (row, col) in path)
+            starred[row, col] = !starred[row, col];
     }
 }

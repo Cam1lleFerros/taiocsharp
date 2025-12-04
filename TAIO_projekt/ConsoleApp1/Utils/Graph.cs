@@ -1,16 +1,19 @@
 ﻿namespace SubgraphIsomorphism.Utils;
 
-public class Graph(int n)
+public class Graph
 {
-    public int size = n;
-    public bool[,] adjMatrix = new bool[n, n];
+    public int size;
+    public bool[,] adjMatrix;
     public bool edgesWereAdded = false;
-    public bool[,] isNewEdge = new bool[n, n];
+    public bool[,] isNewEdge;
 
-    // Pierwszy wiersz pliku zawiera liczbę wierzchołków pierwszego grafu, ta informacja jest zapisana w jednym wierszu pliku,
-    // następne wiersze pliku zawierają wiersze macierzy sąsiedztwa pierwszego grafu z elementami oddzielonymi spacją,
-    // kolejny wiersz pliku zawiera liczbę wierzchołków drugiego grafu,
-    // następne wiersze pliku zawierają wiersze macierzy sąsiedztwa drugiego grafu.
+    public Graph(int n)
+    {
+        size = n;
+        adjMatrix = new bool[n, n];
+        isNewEdge = new bool[n, n];
+    }
+
     internal static (Graph, Graph) ReadTwoFromFile(string path)
     {
         var rawLines = File.ReadAllLines(path).Select(l => l.Trim()).ToArray();
@@ -35,6 +38,7 @@ public class Graph(int n)
         }
 
         return (g1, g2);
+
         static bool ParseBooleanToken(string token) => token != "0";
     }
 
@@ -75,5 +79,16 @@ public class Graph(int n)
                 if (adjMatrix[i, j]) ++sum;
         }
         return sum;
+    }
+
+    public Graph Clone()
+    {
+        var g = new Graph(size);
+        for (var i = 0; i < size; ++i)
+        {
+            for (var j = 0; j < size; ++j)
+                g.adjMatrix[i, j] = adjMatrix[i, j];
+        }
+        return g;
     }
 }

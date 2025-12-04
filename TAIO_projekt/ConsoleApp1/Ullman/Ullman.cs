@@ -4,11 +4,11 @@ namespace SubgraphIsomorphism.Ullman;
 public class Ullman(Graph p, Graph g)
 {
     public Graph g = g, p = p;
+    private int deepestMatch = 0;
+    private bool[,]? bestMatch = null;
 
     private int Rows => p.size;
     private int Cols => g.size;
-    private int deepestMatch = 0;
-    private bool[,]? bestMatch = null;
 
     public (bool, bool[,]?) FindIsomorphism()
     {

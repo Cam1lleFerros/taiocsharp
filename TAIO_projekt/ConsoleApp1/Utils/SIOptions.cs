@@ -69,11 +69,11 @@ public class SIOptions
                 var patternSizeMax = int.Parse(seedContent[2]);
                 var patternStep = int.Parse(seedContent[3]);
                 var edgeProbability = double.Parse(seedContent[4]);
-                InputGenerator.InputGenerator.GenerateInputsForSize(outDirectory, targetSize, patternSizeMin, 
+                InputGenerator.InputGenerator.GenerateInputsForSize(outDirectory, targetSize, patternSizeMin,
                     patternSizeMax, patternStep, edgeProbability);
             }
             else
-                InputGenerator.InputGenerator.GenerateInputsForSize(outDirectory, 10, 1, 9, 1); 
+                InputGenerator.InputGenerator.GenerateInputsForSize(outDirectory, 10, 1, 9, 1);
             Console.WriteLine("Input generation completed.");
             Environment.Exit(0);
         }

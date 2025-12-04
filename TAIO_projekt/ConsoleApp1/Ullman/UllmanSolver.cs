@@ -8,7 +8,7 @@ public class UllmanSolver : ISubgraphIsomorphismSolver
     {
         matrixRecord ??= FindBestMapping(g1, g2);
 
-        bool[,] workingMapping = (bool[,])matrixRecord.Clone();
+        var workingMapping = (bool[,])matrixRecord.Clone();
 
         CompleteMapping(g1, g2, workingMapping);
 
@@ -42,15 +42,15 @@ public class UllmanSolver : ISubgraphIsomorphismSolver
 
         var mapping = new bool[sourceSize, targetSize];
 
-        for (var i = 0; i < sourceSize; i++)
+        for (var i = 0; i < sourceSize; ++i)
         {
             var bestMatch = -1;
             var bestScore = int.MaxValue;
 
-            for (var j = 0; j < targetSize; j++)
+            for (var j = 0; j < targetSize; ++j)
             {
                 var alreadyMapped = false;
-                for (var k = 0; k < i; k++)
+                for (var k = 0; k < i; ++k)
                 {
                     if (mapping[k, j])
                     {
@@ -204,9 +204,7 @@ public class UllmanSolver : ISubgraphIsomorphismSolver
         var (result, matrix) = ullman.FindIsomorphism();
 
         if (result)
-        {
             return new Results(matrix!, 0, true, null);
-        }
         else
         {
             var (expandedG2, workingMapping) = Expand(g1, g2, matrix);
@@ -215,8 +213,5 @@ public class UllmanSolver : ISubgraphIsomorphismSolver
         }
     }
 
-    public string Name()
-    {
-        return "Ullman Exact Solver";
-    }
+    public string Name() => "Ullman Exact Solver";
 }

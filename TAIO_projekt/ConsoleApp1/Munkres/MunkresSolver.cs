@@ -10,28 +10,28 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
     {
         var n = pattern.size;
         var m = target.size;
-        int totalSize = n + m;
+        var totalSize = n + m;
         var costMatrix = new double[totalSize, totalSize];
 
-        for (var i = 0; i < totalSize; i++)
-            for (var j = 0; j < totalSize; j++)
+        for (var i = 0; i < totalSize; ++i)
+            for (var j = 0; j < totalSize; ++j)
                 costMatrix[i, j] = 1000;
 
-        for (var i = 0; i < n; i++)
+        for (var i = 0; i < n; ++i)
         {
-            for (var j = 0; j < m; j++)
+            for (var j = 0; j < m; ++j)
                 costMatrix[i, j] = NodeCompatibilityCost(pattern, target, i, j);
         }
 
-        for (var i = 0; i < n; i++)
+        for (var i = 0; i < n; ++i)
             costMatrix[i, m + i] = NodeDeletionCost(pattern, i);
 
-        for (var j = 0; j < m; j++)
+        for (var j = 0; j < m; ++j)
             costMatrix[n + j, j] = NodeInsertionCost(target, j);
 
-        for (var i = 0; i < m; i++)
+        for (var i = 0; i < m; ++i)
         {
-            for (var j = 0; j < n; j++)
+            for (var j = 0; j < n; ++j)
                 costMatrix[n + i, m + j] = 0;
         }
 
@@ -46,7 +46,7 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
         var targetDegree = target.OutDegree(targetNode);
 
         if (patternDegree > targetDegree)
-            cost += 100; // Heavy penalty for degree incompatibility
+            cost += 1000;
 
         cost += NeighborhoodCompatibilityCost(pattern, target, patternNode, targetNode);
 
@@ -126,9 +126,9 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
         var mapping = new int[n];
         Array.Fill(mapping, -1);
 
-        for (var i = 0; i < n; i++)
+        for (var i = 0; i < n; ++i)
         {
-            for (var j = 0; j < m; j++)
+            for (var j = 0; j < m; ++j)
             {
                 if (assignment[i, j])
                 {
@@ -144,16 +144,16 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
     {
         var supergraph = new Graph(target.size);
 
-        for (var i = 0; i < target.size; i++)
-            for (var j = 0; j < target.size; j++)
+        for (var i = 0; i < target.size; ++i)
+            for (var j = 0; j < target.size; ++j)
                 supergraph.adjMatrix[i, j] = target.adjMatrix[i, j];
 
-        for (var u = 0; u < pattern.size; u++)
+        for (var u = 0; u < pattern.size; ++u)
         {
             var mu = mapping[u];
             if (mu < 0) continue;
 
-            for (int v = 0; v < pattern.size; v++)
+            for (int v = 0; v < pattern.size; ++v)
             {
                 if (pattern.adjMatrix[u, v])
                 {
@@ -171,15 +171,15 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
 
     private static bool IsExactSubgraphIsomorphism(Graph pattern, Graph target, int[] mapping)
     {
-        for (var i = 0; i < mapping.Length; i++)
+        for (var i = 0; i < mapping.Length; ++i)
         {
             if (mapping[i] < 0 || mapping[i] >= target.size)
                 return false;
         }
 
-        for (var u = 0; u < pattern.size; u++)
+        for (var u = 0; u < pattern.size; ++u)
         {
-            for (var v = 0; v < pattern.size; v++)
+            for (var v = 0; v < pattern.size; ++v)
             {
                 if (pattern.adjMatrix[u, v])
                 {
@@ -207,9 +207,9 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
     {
         var missing = 0;
 
-        for (var u = 0; u < pattern.size; u++)
+        for (var u = 0; u < pattern.size; ++u)
         {
-            for (var v = 0; v < pattern.size; v++)
+            for (var v = 0; v < pattern.size; ++v)
             {
                 if (pattern.adjMatrix[u, v])
                 {

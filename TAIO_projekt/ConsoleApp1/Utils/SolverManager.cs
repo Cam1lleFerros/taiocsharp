@@ -60,8 +60,8 @@ public class SolverManager
         inputFiles = [.. from f in inputFiles
                          where !f.EndsWith("_mapping.txt")
                          select f];
-        int inputCount = inputFiles.Length;
-        int processedCount = 0;
+        var inputCount = inputFiles.Length;
+        var processedCount = 0;
         var logPath = Path.Combine(options.outDirectory, "batch_log.txt");
         using var logWriter = new StreamWriter(logPath, append: true);
         //ConsoleUtils.WriteProgressBar(0);
@@ -76,7 +76,7 @@ public class SolverManager
             var outPath = Path.Combine(options.outDirectory, outputFileName);
             for (var i = 0; i < solvers.Count; ++i)
                 Solve(g1, g2, i, outPath, logWriter);
-            processedCount++;
+            ++processedCount;
             timer.Stop();
             var infoString = $"Processed {processedCount} out of {inputCount} files.";
             Console.Write(infoString);

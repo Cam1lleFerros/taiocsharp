@@ -10,18 +10,21 @@ public class Munkres
         for (var i = 0; i < n; i++)
         {
             double min = cost[i, 0];
-            for (var j = 1; j < n; j++)
-                if (cost[i, j] < min) min = cost[i, j];
-            for (var j = 0; j < n; j++)
+            for (var j = 1; j < n; ++j)
+            {
+                if (cost[i, j] < min) 
+                    min = cost[i, j];
+            }
+            for (var j = 0; j < n; ++j)
                 cost[i, j] -= min;
         }
 
-        for (var j = 0; j < n; j++)
+        for (var j = 0; j < n; ++j)
         {
             double min = cost[0, j];
-            for (var i = 1; i < n; i++)
+            for (var i = 1; i < n; ++i)
                 if (cost[i, j] < min) min = cost[i, j];
-            for (var i = 0; i < n; i++)
+            for (var i = 0; i < n; ++i)
                 cost[i, j] -= min;
         }
 
@@ -55,7 +58,7 @@ public class Munkres
 
         while (iterations++ < maxIterations)
         {
-            int coveredColumns = CoverStarredColumns(starred, colCovered);
+            var coveredColumns = CoverStarredColumns(starred, colCovered);
 
             if (coveredColumns == n)
                 break;
@@ -93,10 +96,14 @@ public class Munkres
         }
 
         double totalCost = 0;
-        for (var i = 0; i < n; i++)
-            for (var j = 0; j < n; j++)
+        for (var i = 0; i < n; ++i)
+        {
+            for (var j = 0; j < n; ++j)
+            {
                 if (starred[i, j])
                     totalCost += originalCost[i, j];
+            }
+        }
 
         return (starred, totalCost);
     }
@@ -111,20 +118,22 @@ public class Munkres
 
     private static void ClearPrimes(bool[,] primeMarks)
     {
-        int n = primeMarks.GetLength(0);
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < n; j++)
+        var n = primeMarks.GetLength(0);
+        for (var i = 0; i < n; ++i)
+        {
+            for (var j = 0; j < n; ++j)
                 primeMarks[i, j] = false;
+        }
     }
 
     private static int CoverStarredColumns(bool[,] starred, bool[] colCovered)
     {
-        int n = starred.GetLength(0);
-        int coveredCount = 0;
+        var n = starred.GetLength(0);
+        var coveredCount = 0;
 
-        for (int j = 0; j < n; j++)
+        for (var j = 0; j < n; ++j)
         {
-            for (int i = 0; i < n; i++)
+            for (var i = 0; i < n; ++i)
             {
                 if (starred[i, j])
                 {
@@ -140,13 +149,14 @@ public class Munkres
 
     private static (int row, int col) FindUncoveredZero(double[,] cost, bool[] rowCovered, bool[] colCovered)
     {
-        int n = cost.GetLength(0);
-        for (int i = 0; i < n; i++)
+        var n = cost.GetLength(0);
+        for (var i = 0; i < n; ++i)
         {
             if (rowCovered[i]) continue;
-            for (int j = 0; j < n; j++)
+            for (var j = 0; j < n; ++j)
             {
-                if (colCovered[j]) continue;
+                if (colCovered[j]) 
+                    continue;
                 if (IsZero(cost[i, j]))
                     return (i, j);
             }
@@ -156,31 +166,35 @@ public class Munkres
 
     private static int FindStarInRow(bool[,] starred, int row)
     {
-        int n = starred.GetLength(1);
-        for (int j = 0; j < n; j++)
+        var n = starred.GetLength(1);
+        for (var j = 0; j < n; ++j)
+        {
             if (starred[row, j])
                 return j;
+        }
         return -1;
     }
 
     private static int FindStarInColumn(bool[,] starred, int col)
     {
-        int n = starred.GetLength(0);
-        for (int i = 0; i < n; i++)
+        var n = starred.GetLength(0);
+        for (var i = 0; i < n; ++i)
+        {
             if (starred[i, col])
                 return i;
+        }
         return -1;
     }
 
     private static void AdjustMatrix(double[,] cost, bool[] rowCovered, bool[] colCovered)
     {
-        int n = cost.GetLength(0);
+        var n = cost.GetLength(0);
 
-        double minVal = double.MaxValue;
-        for (int i = 0; i < n; i++)
+        var minVal = double.MaxValue;
+        for (var i = 0; i < n; ++i)
         {
             if (rowCovered[i]) continue;
-            for (int j = 0; j < n; j++)
+            for (var j = 0; j < n; ++j)
             {
                 if (colCovered[j]) continue;
                 if (cost[i, j] < minVal)
@@ -188,9 +202,9 @@ public class Munkres
             }
         }
 
-        for (int i = 0; i < n; i++)
+        for (var i = 0; i < n; ++i)
         {
-            for (int j = 0; j < n; j++)
+            for (var j = 0; j < n; ++j)
             {
                 if (rowCovered[i])
                     cost[i, j] += minVal;
@@ -226,7 +240,7 @@ public class Munkres
             {
                 var lastRow = path[^1].Item1;
                 var primeCol = -1;
-                for (int j = 0; j < primeMarks.GetLength(1); j++)
+                for (var j = 0; j < primeMarks.GetLength(1); ++j)
                 {
                     if (primeMarks[lastRow, j])
                     {

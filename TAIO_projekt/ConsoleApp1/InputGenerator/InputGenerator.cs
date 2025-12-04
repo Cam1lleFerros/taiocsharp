@@ -2,7 +2,8 @@
 
 public class InputGenerator
 {
-    public static void GenerateInputsForSize(string directoryPath, int targetSize = 100, int startPatternSize = 10, int endPatternSize = 99, int patternStep = 1, double edgeProbability = 0.5)
+    public static void GenerateInputsForSize(string directoryPath, int targetSize = 100,
+        int startPatternSize = 10, int endPatternSize = 99, int patternStep = 1, double edgeProbability = 0.5)
     {
         for (var patternSize = startPatternSize; patternSize <= endPatternSize; patternSize += patternStep)
         {
@@ -13,7 +14,8 @@ public class InputGenerator
         }
     }
 
-    public static void GenerateMultipleFiles(string directoryPath, int numberOfFiles = 15, int patternSize = 25, int targetSize = 100, double edgeProbability = 0.5)
+    public static void GenerateMultipleFiles(string directoryPath, int numberOfFiles = 15,
+        int patternSize = 25, int targetSize = 100, double edgeProbability = 0.5)
     {
         for (var i = 0; i < numberOfFiles; i += 2)
         {
@@ -31,28 +33,28 @@ public class InputGenerator
         var rand = new Random();
         var patternAdjMat = new bool[patternSize, patternSize];
         var targetAdjMat = new bool[targetSize, targetSize];
-        for (var i = 0; i < patternSize; i++)
+        for (var i = 0; i < patternSize; ++i)
         {
-            for (var j = 0; j < patternSize; j++)
+            for (var j = 0; j < patternSize; ++j)
                 patternAdjMat[i, j] = i != j && rand.NextDouble() < edgeProbability;
         }
-        for (var i = 0; i < targetSize; i++)
+        for (var i = 0; i < targetSize; ++i)
         {
-            for (var j = 0; j < targetSize; j++)
+            for (var j = 0; j < targetSize; ++j)
                 targetAdjMat[i, j] = i != j && rand.NextDouble() < edgeProbability;
         }
         using var writer = new StreamWriter(path);
         writer.WriteLine($"{patternSize}");
-        for (var i = 0; i < patternSize; i++)
+        for (var i = 0; i < patternSize; ++i)
         {
-            for (var j = 0; j < patternSize; j++)
+            for (var j = 0; j < patternSize; ++j)
                 writer.Write(patternAdjMat[i, j] ? "1 " : "0 ");
             writer.WriteLine();
         }
         writer.WriteLine($"{targetSize}");
-        for (var i = 0; i < targetSize; i++)
+        for (var i = 0; i < targetSize; ++i)
         {
-            for (var j = 0; j < targetSize; j++)
+            for (var j = 0; j < targetSize; ++j)
                 writer.Write(targetAdjMat[i, j] ? "1 " : "0 ");
             writer.WriteLine();
         }
@@ -63,7 +65,7 @@ public class InputGenerator
         var rand = new Random();
         var mapping = new Dictionary<int, int>();
         var usedTargetNodes = new HashSet<int>();
-        for (var i = 0; i < patternSize; i++)
+        for (var i = 0; i < patternSize; ++i)
         {
             int targetNode;
             do
@@ -76,29 +78,30 @@ public class InputGenerator
         return mapping;
     }
 
-    public static void GenerateSubgraphIsomorphism(string path, int patternSize, int targetSize, double edgeProbability)
+    public static void GenerateSubgraphIsomorphism(string path, int patternSize, int targetSize,
+        double edgeProbability)
     {
         var rand = new Random();
         var patternAdjMat = new bool[patternSize, patternSize];
         var targetAdjMat = new bool[targetSize, targetSize];
-        for (var i = 0; i < patternSize; i++)
+        for (var i = 0; i < patternSize; ++i)
         {
-            for (var j = 0; j < patternSize; j++)
+            for (var j = 0; j < patternSize; ++j)
                 patternAdjMat[i, j] = i != j && rand.NextDouble() < edgeProbability;
 
         }
 
         var mapping = GenerateRandomMapping(patternSize, targetSize);
 
-        for (var i = 0; i < targetSize; i++)
+        for (var i = 0; i < targetSize; ++i)
         {
-            for (var j = 0; j < targetSize; j++)
+            for (var j = 0; j < targetSize; ++j)
                 targetAdjMat[i, j] = i != j && rand.NextDouble() < edgeProbability;
         }
 
-        for (var i = 0; i < patternSize; i++)
+        for (var i = 0; i < patternSize; ++i)
         {
-            for (var j = 0; j < patternSize; j++)
+            for (var j = 0; j < patternSize; ++j)
             {
                 if (i != j)
                 {
@@ -115,23 +118,23 @@ public class InputGenerator
 
         using var writer = new StreamWriter(path);
         writer.WriteLine($"{patternSize}");
-        for (var i = 0; i < patternSize; i++)
+        for (var i = 0; i < patternSize; ++i)
         {
-            for (var j = 0; j < patternSize; j++)
+            for (var j = 0; j < patternSize; ++j)
                 writer.Write(patternAdjMat[i, j] ? "1 " : "0 ");
             writer.WriteLine();
         }
         writer.WriteLine($"{targetSize}");
-        for (var i = 0; i < targetSize; i++)
+        for (var i = 0; i < targetSize; ++i)
         {
-            for (var j = 0; j < targetSize; j++)
+            for (var j = 0; j < targetSize; ++j)
                 writer.Write(targetAdjMat[i, j] ? "1 " : "0 ");
             writer.WriteLine();
         }
 
         var pathMapping = path.Replace(".txt", "_mapping.txt");
         using var writerMapping = new StreamWriter(pathMapping);
-        for (var i = 0; i < patternSize; i++)
+        for (var i = 0; i < patternSize; ++i)
             writerMapping.WriteLine($"{i} -> {mapping[i]}");
     }
 }

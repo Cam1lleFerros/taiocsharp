@@ -84,10 +84,7 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
                     L[i, j] = NeighborSubstitutionCost(pattern, target, u, v);
                 }
                 else if (i < dp) 
-                {
-                    var u = pNeighbors[i];
                     L[i, j] = double.PositiveInfinity;
-                }
                 else if (j < dt)
                 {
                     var v = tNeighbors[j];

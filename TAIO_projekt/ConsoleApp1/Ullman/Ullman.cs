@@ -7,7 +7,7 @@ public class Ullman(Graph p, Graph g)
     private int deepestMatch = 0;
     private bool[,]? bestMatch = null;
     private int bestCost = int.MaxValue;
-    private List<(int, int)> bestEdgesToAdd = [];
+    private readonly List<(int, int)> bestEdgesToAdd = [];
 
 
     private int Rows => p.size;

@@ -213,7 +213,7 @@ public class UllmanSolver : ISubgraphIsomorphismSolver
         {
             //var (expandedG2, workingMapping) = Expand(g1, g2, matrix);
             //var missingEdges = CountEdgesToAdd(g1, expandedG2, workingMapping);
-            Graph supergraph = new Graph(g2.size);
+            Graph supergraph = new(g2.size);
             for (var i = 0; i < g2.size; ++i)
             {
                 for (var j = 0; j < g2.size; ++j)

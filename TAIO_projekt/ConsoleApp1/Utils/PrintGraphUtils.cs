@@ -5,7 +5,7 @@ public static class PrintGraphUtils
     public const string ExactMatchMessage = "The target contains an exact subgraph isomorphism of the pattern.";
     public const string ExactMappingDisplayMessage = "Exact mapping:";
     public const string ExactMatchFailureMessage = "The target does not contain a subgraph isomorphism of the pattern.";
-    public const string GraphComplementDisplayMessage = "Target graph with missing edges restored:";
+    public const string GraphComplementDisplayMessage = "Target graph with missing edges restored (marked with *):";
     public const string ApproximatedMappingDisplayMessage = "Approximated mapping:";
     public static void PrintMatrix(bool[,] matrix, TextWriter writer)
     {
@@ -53,6 +53,52 @@ public static class PrintGraphUtils
         PrintMatrix(matrix, writer);
         if (options.console)
             PrintMatrix(matrix);
+    }
+
+    public static void PrintExtendedGraphOptions(Graph graph, TextWriter writer, SIOptions options)
+    {
+        if(!graph.edgesWereAdded)
+        {
+            PrintMatrixOptions(graph.adjMatrix, writer, options);
+            return;
+        }
+
+        var rows = graph.adjMatrix.GetLength(0);
+        var cols = graph.adjMatrix.GetLength(1);
+        for (var i = 0; i < rows; ++i)
+        {
+            for (var j = 0; j < cols; ++j)
+            {
+                var symbol = graph.adjMatrix[i, j] ? (graph.isNewEdge[i, j] ? "* " : "1 ") : "0 ";
+                writer.Write(symbol);
+                if (options.console)
+                    Console.Write(symbol);
+            }
+            writer.WriteLine();
+            if (options.console)
+                Console.WriteLine();
+        }
+    }
+
+    public static void PrintMappingOptions(bool[,] matrix, TextWriter writer, SIOptions options)
+    {
+        var rows = matrix.GetLength(0);
+        var cols = matrix.GetLength(1);
+        for (var i = 0; i < rows; ++i)
+        {
+            for (var j = 0; j < cols; ++j)
+            {
+                if (matrix[i, j])
+                {
+                    writer.WriteLine($"{i} -> {j}");
+                    if (options.console)
+                    {
+                        Console.WriteLine($"{i} -> {j}");
+                    }
+                }
+            }
+
+        }
     }
 
 

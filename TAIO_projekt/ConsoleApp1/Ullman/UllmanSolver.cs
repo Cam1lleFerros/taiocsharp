@@ -138,7 +138,11 @@ public class UllmanSolver : ISubgraphIsomorphismSolver
                     var mappedJ = GetMappedNode(mapping, j, g2.size);
 
                     if (mappedI != -1 && mappedJ != -1 && !expanded.adjMatrix[mappedI, mappedJ])
-                        expanded.adjMatrix[mappedI, mappedJ] = true;
+                    {
+                        expanded.adjMatrix[mappedI, mappedJ] = true; 
+                        expanded.edgesWereAdded = true;
+                        expanded.isNewEdge[mappedI, mappedJ] = true;
+                    }
                 }
             }
         }

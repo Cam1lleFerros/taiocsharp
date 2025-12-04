@@ -64,8 +64,6 @@ public class SolverManager
         var processedCount = 0;
         var logPath = Path.Combine(options.outDirectory, "batch_log.txt");
         using var logWriter = new StreamWriter(logPath, append: true);
-        //ConsoleUtils.WriteProgressBar(0);
-        //ConsoleUtils.WriteProgress(0);
         var timer = new Stopwatch();
         foreach (var inputFile in inputFiles)
         {
@@ -109,6 +107,8 @@ public class SolverManager
 
     public void Solve(Graph g1, Graph g2, int idx = 0, string outPath = "", StreamWriter? logWriter = null)
     {
+
+
         if (String.IsNullOrEmpty(outPath))
             outPath = options.outPath;
 
@@ -122,6 +122,13 @@ public class SolverManager
         timer.Stop();
         outPath = outPath.Replace(".txt", $"_{solver.Name()}.txt");
         using var writer = new StreamWriter(outPath, append: options.append);
+        PrintGraphUtils.PrintMessageOptions($"Graphs given as inputs:", writer, options);
+        PrintGraphUtils.PrintMessageOptions($"Pattern graph (size {g1.size}):", writer, options);
+        PrintGraphUtils.PrintMatrixOptions(g1.adjMatrix, writer, options);
+        PrintGraphUtils.PrintMessageOptions($"Target graph (size {g2.size}):", writer, options);
+        PrintGraphUtils.PrintMatrixOptions(g2.adjMatrix, writer, options);
+
+
         logWriter?.WriteLine($"{solver.Name()}; {g1.size}; {g2.size}; {timer.ElapsedMilliseconds}");
         PrintGraphUtils.PrintMessageOptions($"--- Results for {solver.Name()} solver ---", writer, options);
         if (options.verbose)
@@ -130,7 +137,7 @@ public class SolverManager
         {
             PrintGraphUtils.PrintMessageOptions(PrintGraphUtils.ExactMatchMessage, writer, options);
             PrintGraphUtils.PrintMessageOptions(PrintGraphUtils.ExactMappingDisplayMessage, writer, options);
-            PrintGraphUtils.PrintMatrixOptions(results.Mapping, writer, options);
+            PrintGraphUtils.PrintMappingOptions(results.Mapping, writer, options);
         }
         else
         {
@@ -140,12 +147,10 @@ public class SolverManager
             if (results.GraphComplement != null)
             {
                 PrintGraphUtils.PrintMessageOptions(PrintGraphUtils.GraphComplementDisplayMessage, writer, options);
-                PrintGraphUtils.PrintMatrix(results.GraphComplement.adjMatrix, writer);
-                if (options.console)
-                    PrintGraphUtils.PrintMatrix(results.GraphComplement.adjMatrix);
+                PrintGraphUtils.PrintExtendedGraphOptions(results.GraphComplement, writer, options);
             }
             PrintGraphUtils.PrintMessageOptions(PrintGraphUtils.ApproximatedMappingDisplayMessage, writer, options);
-            PrintGraphUtils.PrintMatrixOptions(results.Mapping, writer, options);
+            PrintGraphUtils.PrintMappingOptions(results.Mapping, writer, options);
         }
     }
 }

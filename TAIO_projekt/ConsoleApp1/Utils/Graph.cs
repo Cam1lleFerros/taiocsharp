@@ -4,6 +4,8 @@ public class Graph(int n)
 {
     public int size = n;
     public bool[,] adjMatrix = new bool[n, n];
+    public bool edgesWereAdded = false;
+    public bool[,] isNewEdge = new bool[n, n];
 
     // Pierwszy wiersz pliku zawiera liczbę wierzchołków pierwszego grafu, ta informacja jest zapisana w jednym wierszu pliku,
     // następne wiersze pliku zawierają wiersze macierzy sąsiedztwa pierwszego grafu z elementami oddzielonymi spacją,

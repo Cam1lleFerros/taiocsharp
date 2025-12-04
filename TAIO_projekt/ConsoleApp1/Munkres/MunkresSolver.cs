@@ -161,6 +161,8 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
                     if (mv >= 0 && !supergraph.adjMatrix[mu, mv])
                     {
                         supergraph.adjMatrix[mu, mv] = true;
+                        supergraph.edgesWereAdded = true;
+                        supergraph.isNewEdge[mu, mv] = true;
                     }
                 }
             }

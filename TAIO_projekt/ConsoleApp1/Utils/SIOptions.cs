@@ -22,24 +22,24 @@ public class SIOptions
     public SIOptions(string[] args)
     {
         var opts = new OptionSet() {
-        { "input=", "specify input file (default: input.txt)", v => inPath = v },
-        { "output=", "specify output file (default: output.txt)", v => {outPath = v; } },
-        { "inputDir=", "specify input directory for batch solving", v => inDirectory = v },
-        { "outputDir=", "specify output directory for batch solving", v => outDirectory = v },
-        { "seed=", "seed file for input generation. A seed file needs to contain five values, separated with spaces: target size, pattern size minimum and maximum, pattern step, and edge probability", v => seedPath = v },
-        { "g|generate", "Generate random inputs for the program in outputDir, then exit the program without solving.", v =>  {generate = true; }},
-        { "e|exact", "run the exact algorithm (Ullman)", v => { exact = true; } },
-        { "a|approximate", "run the approximate algorithm (Munkres modification)" ,v => { approximate = true; } },
-        { "c|console", "print results to command line", v => console = true},
-        { "p|append", "append results to output file if it already exists", v => append = true },
-        { "v|verbose", "write processing time into output file", v => verbose = true },
-        { "l|clean", "clean input directory before generating", v => clean = true },
-        { "h|?|help", "show help",  v => help = v != null },
+        { "input=", "ścieżka pliku z danymi (domyślnie: input.txt)", v => inPath = v },
+        { "output=", "ścieżka do pliku z odpowiedzią, który zostanie utworzony lub zaktualizowany (domyślnie: output.txt)", v => {outPath = v; } },
+        { "inputDir=", "ścieżka do folderu z plikami z danymi dla rozwiązywania masowego", v => inDirectory = v },
+        { "outputDir=", "ścieżka do folderu z plikami odpowiedzi dla rozwiązywania masowego", v => outDirectory = v },
+        { "seed=", "ścieżka do pliku generacji danych. Szczegóły w dokumentacji.", v => seedPath = v },
+        { "g|generate", "zamiast rozwiązywać problemy, program generuje losowe dane w folderze sprecyzowanym przez --outputDir.", v =>  {generate = true; }},
+        { "e|exact", "program użyje algorytmu dokładnego (Ullmana)", v => { exact = true; } },
+        { "a|approximate", "program użyje algorytmu przybliżonego (Munkresa/węgierskiego)" ,v => { approximate = true; } },
+        { "c|console", "program wypisze odpowiedzi na standardowe wyjście", v => console = true},
+        { "p|append", "program dopisze odpowiedzi w plikach wyjściowych, jeśli już istnieją, zamiast je nadpisywać", v => append = true },
+        { "v|verbose", "program zapisze czas rozwiązywania do plików wyjściowych", v => verbose = true },
+        { "l|clean", "program wyczyści folder --outputDir przed tworzeniem w nim nowych plików", v => clean = true },
+        { "h|?|help", "pomoc",  v => help = v != null },
 
     };
         List<string> extra = opts.Parse(args);
 
-        if (help)
+        if (help || args.Length == 0)
         {
             ShowHelp(opts);
             Environment.Exit(0);
@@ -48,10 +48,10 @@ public class SIOptions
         if (generate)
         {
             if (exact || approximate || !String.IsNullOrEmpty(inDirectory))
-                throw new ArgumentException("The --generate option must be used alone, without other options.");
+                throw new ArgumentException("Opcja --generate nie może być użyta z opcjami --exact, --approximate lub --inputDir");
 
             if (String.IsNullOrEmpty(outDirectory))
-                throw new ArgumentException("The --generate option requires the --outputDir option to specify where to save generated inputs.");
+                throw new ArgumentException("Opcja --generate potrzebuje, by był sprecyzowany folder wyjściowy przy użyciu --outputDir");
 
             if (clean && Directory.Exists(outDirectory))
             {
@@ -63,8 +63,7 @@ public class SIOptions
             {
                 var seedContent = File.ReadAllText(seedPath).Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 if (seedContent.Length != 5)
-                    throw new ArgumentException("Seed file must contain exactly five values: target size, " +
-                        "pattern size minimum and maximum, pattern step, and edge probability.");
+                    throw new ArgumentException("Niepoprawne ziarno generatora.");
                 var targetSize = int.Parse(seedContent[0]);
                 var patternSizeMin = int.Parse(seedContent[1]);
                 var patternSizeMax = int.Parse(seedContent[2]);
@@ -75,23 +74,23 @@ public class SIOptions
             }
             else
                 InputGenerator.InputGenerator.GenerateInputsForSize(outDirectory, 10, 1, 9, 1);
-            Console.WriteLine("Input generation completed.");
+            Console.WriteLine("Generowanie danych zakończone pomyślnie.");
             Environment.Exit(0);
         }
 
         if (!exact && !approximate)
         {
-            Console.WriteLine("No algorithm specified; the program will choose exact or approximate based on input sizes.");
+            Console.WriteLine("Nie został wybrany żaden algorytm - program dobierze algorytm do rozmiaru grafów p i g.");
             dynamic = true;
         }
     }
 
     static void ShowHelp(OptionSet p)
     {
-        Console.WriteLine("Usage:");
-        Console.WriteLine("The program solves the Subgraph Isomorphism Problem with either the Ullman or Munkres algorithms.");
+        Console.WriteLine("Sposób używania programu:");
+        Console.WriteLine("Program rozwiązuje problem izomorfizmu podgrafów przy użyciu algorytmów Ullmana lub Munkresa.");
         Console.WriteLine();
-        Console.WriteLine("The following options can be used:");
+        Console.WriteLine("Program akceptuje poniższe opcje:");
         p.WriteOptionDescriptions(Console.Out);
     }
 }

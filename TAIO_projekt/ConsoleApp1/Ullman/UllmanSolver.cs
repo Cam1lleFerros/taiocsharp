@@ -232,5 +232,5 @@ public class UllmanSolver : ISubgraphIsomorphismSolver
         }
     }
 
-    public string Name() => "Ullman Exact Solver";
+    public string Name() => "Algorytm Dokładny Ullmana";
 }

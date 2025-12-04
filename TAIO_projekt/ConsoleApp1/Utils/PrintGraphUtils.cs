@@ -2,11 +2,12 @@
 
 public static class PrintGraphUtils
 {
-    public const string ExactMatchMessage = "The target contains an exact subgraph isomorphism of the pattern.";
-    public const string ExactMappingDisplayMessage = "Exact mapping:";
-    public const string ExactMatchFailureMessage = "The target does not contain a subgraph isomorphism of the pattern.";
-    public const string GraphComplementDisplayMessage = "Target graph with missing edges restored (marked with *):";
-    public const string ApproximatedMappingDisplayMessage = "Approximated mapping:";
+    public const string ExactMatchMessage = "Cel zawiera podgraf izomorficzny z wzorem.";
+    public const string ExactMappingDisplayMessage = "Dokładne mapowanie:";
+    public const string ExactMatchFailureMessage = "Cel nie zawiera podgrafu izomorficznego z wzorem.";
+    public const string GraphComplementDisplayMessage = "Graf docelowy z uzupełnionymi krawędziami (zaznaczonymi jako *):";
+    public const string ApproximatedMappingDisplayMessage = "Przybliżone mapowanie:";
+    public const string OutputDirErrorMessage = "Przy rozwiązywaniu masowym, należy sprecyzować folder wyjściowy przy użyciu opcji --outputDir.";
     public static void PrintMatrix(bool[,] matrix, TextWriter writer)
     {
         var rows = matrix.GetLength(0);

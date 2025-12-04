@@ -153,7 +153,7 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
     {
         var totalSize = assignment.GetLength(0);
         if (assignment.GetLength(1) != totalSize)
-            throw new ArgumentException("assignment must be square");
+            throw new ArgumentException("Przypisanie powinno być macierzą kwadratową.");
 
         var mapping = new int[n];
         Array.Fill(mapping, -1);

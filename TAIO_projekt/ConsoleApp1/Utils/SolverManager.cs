@@ -42,7 +42,7 @@ public class SolverManager
         {
             batchSolving = true;
             if (options.outDirectory == string.Empty)
-                throw new ArgumentException("When using batch solving, output directory must be specified with --outputDir option.");
+                throw new ArgumentException(PrintGraphUtils.OutputDirErrorMessage);
             if (!Directory.Exists(options.outDirectory))
                 Directory.CreateDirectory(options.outDirectory);
         }
@@ -59,7 +59,7 @@ public class SolverManager
                 RegisterSolver(new UllmanSolver());
             else
                 RegisterSolver(new MunkresSolver());
-            Console.WriteLine($"No solver specified, selected default solver based on input sizes: {(alg == 0 ? "Ullman" : "Munkres")}");
+            Console.WriteLine($"Nie został jawnie wybrany algorytm - algorytm wybrany zostanie dynamicznie: {(alg == 0 ? "Ullman" : "Munkres")}");
         }
             
         this.options = options;
@@ -93,7 +93,7 @@ public class SolverManager
                 Solve(g1, g2, i, outPath, logWriter);
             ++processedCount;
             timer.Stop();
-            var infoString = $"Processed {processedCount} out of {inputCount} files.";
+            var infoString = $"Przetworzono {processedCount} z {inputCount} plików.";
             Console.Write(infoString);
 
             Console.Write(ConsoleUtils.PrepareDeletionString(infoString.Length));
@@ -139,17 +139,17 @@ public class SolverManager
         timer.Stop();
         outPath = outPath.Replace(".txt", $"_{solver.Name()}.txt");
         using var writer = new StreamWriter(outPath, append: options.append);
-        PrintGraphUtils.PrintMessageOptions($"Graphs given as inputs:", writer, options);
-        PrintGraphUtils.PrintMessageOptions($"Pattern graph (size {g1.size}):", writer, options);
+        PrintGraphUtils.PrintMessageOptions($"Grafy dane na wejściu:", writer, options);
+        PrintGraphUtils.PrintMessageOptions($"Graf wzoru (rozmiar {g1.size}):", writer, options);
         PrintGraphUtils.PrintMatrixOptions(g1.adjMatrix, writer, options);
-        PrintGraphUtils.PrintMessageOptions($"Target graph (size {g2.size}):", writer, options);
+        PrintGraphUtils.PrintMessageOptions($"Graf docelowy (rozmiar {g2.size}):", writer, options);
         PrintGraphUtils.PrintMatrixOptions(g2.adjMatrix, writer, options);
 
 
         logWriter?.WriteLine($"{solver.Name()}; {g1.size}; {g2.size}; {timer.ElapsedMilliseconds}");
-        PrintGraphUtils.PrintMessageOptions($"--- Results for {solver.Name()} solver ---", writer, options);
+        PrintGraphUtils.PrintMessageOptions($"--- Rezultaty dla algorytmu : {solver.Name()} ---", writer, options);
         if (options.verbose)
-            PrintGraphUtils.PrintMessageOptions($"Processing time: {timer.ElapsedMilliseconds} ms", writer, options);
+            PrintGraphUtils.PrintMessageOptions($"Czas działania: {timer.ElapsedMilliseconds} ms", writer, options);
         if (results.IsExact)
         {
             PrintGraphUtils.PrintMessageOptions(PrintGraphUtils.ExactMatchMessage, writer, options);
@@ -160,7 +160,7 @@ public class SolverManager
         {
             PrintGraphUtils.PrintMessageOptions(PrintGraphUtils.ExactMatchFailureMessage, writer, options);
             if (results.MissingEdges.HasValue)
-                PrintGraphUtils.PrintMessageOptions($"{results.MissingEdges.Value} edges missing for an exact mapping.", writer, options);
+                PrintGraphUtils.PrintMessageOptions($"Brakuje {results.MissingEdges.Value} krawędzi do poprawnego mapowania.", writer, options);
             if (results.GraphComplement != null)
             {
                 PrintGraphUtils.PrintMessageOptions(PrintGraphUtils.GraphComplementDisplayMessage, writer, options);

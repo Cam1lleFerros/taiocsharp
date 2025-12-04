@@ -45,7 +45,7 @@ public class Graph
     public bool HasEdge(int a, int b)
     {
         if (a < 0 || b < 0 || a >= size || b >= size)
-            throw new IndexOutOfRangeException($"Vertex indexes must be in range [0;n). Arguments given: {a}, {b}");
+            throw new IndexOutOfRangeException($"Indeksy wierzchołków muszą należeć do przedziału [0;n). Podane argumenty: {a}, {b}");
 
         return adjMatrix[a, b];
     }

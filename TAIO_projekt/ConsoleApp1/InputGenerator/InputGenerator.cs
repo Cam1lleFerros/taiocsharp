@@ -7,9 +7,9 @@ public class InputGenerator
     {
         for (var patternSize = startPatternSize; patternSize <= endPatternSize; patternSize += patternStep)
         {
-            var path = Path.Combine(directoryPath, $"input_pattern{patternSize}_target{targetSize}.txt");
+            var path = Path.Combine(directoryPath, $"dane_wzór{patternSize}_cel{targetSize}.txt");
             GenerateRandomInput(path, patternSize, targetSize, edgeProbability);
-            var pathIso = Path.Combine(directoryPath, $"input_iso_pattern{patternSize}_target{targetSize}.txt");
+            var pathIso = Path.Combine(directoryPath, $"dane_izo_wzór{patternSize}_cel{targetSize}.txt");
             GenerateSubgraphIsomorphism(pathIso, patternSize, targetSize, edgeProbability);
         }
     }
@@ -19,16 +19,16 @@ public class InputGenerator
     {
         for (var i = 0; i < numberOfFiles; i += 2)
         {
-            var path = Path.Combine(directoryPath, $"input_{i + 1}.txt");
+            var path = Path.Combine(directoryPath, $"dane_{i + 1}.txt");
             GenerateRandomInput(path, patternSize, targetSize, edgeProbability);
-            var pathIso = Path.Combine(directoryPath, $"input_{i + 2}.txt");
+            var pathIso = Path.Combine(directoryPath, $"dane_{i + 2}.txt");
             GenerateSubgraphIsomorphism(pathIso, patternSize, targetSize, edgeProbability);
         }
     }
     public static void GenerateRandomInput(string path, int patternSize, int targetSize, double edgeProbability)
     {
         if (edgeProbability < 0 || edgeProbability > 1)
-            throw new ArgumentException("Edge probability must be between 0 and 1.");
+            throw new ArgumentException("Prawdopodobieństwo krawędzi musi być w zakresie [0;1].");
 
         var rand = new Random();
         var patternAdjMat = new bool[patternSize, patternSize];

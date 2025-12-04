@@ -140,7 +140,8 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
         var costMatrix = BuildCostMatrix(pattern, target);
         var (assignment, totalCost) = Munkres.Solve(costMatrix);
 
-        var mapping = ExtractNodeMapping(assignment, pattern.size, target.size);
+        var mapping = ExtractNodeMapping(assignment, pattern.size, target.size, costMatrix);
+
         var supergraph = BuildSupergraph(pattern, target, mapping);
 
         var isExact = IsExactSubgraphIsomorphism(pattern, target, mapping);
@@ -148,10 +149,16 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
         return new MappingResult(mapping, totalCost, isExact, supergraph);
     }
 
-    private static int[] ExtractNodeMapping(bool[,] assignment, int n, int m)
+    private static int[] ExtractNodeMapping(bool[,] assignment, int n, int m, double[,] originalCost)
     {
+        var totalSize = assignment.GetLength(0);
+        if (assignment.GetLength(1) != totalSize)
+            throw new ArgumentException("assignment must be square");
+
         var mapping = new int[n];
         Array.Fill(mapping, -1);
+
+        var targetTaken = new bool[m];
 
         for (var i = 0; i < n; ++i)
         {
@@ -160,12 +167,58 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
                 if (assignment[i, j])
                 {
                     mapping[i] = j;
+                    targetTaken[j] = true;
                     break;
                 }
             }
         }
+
+        for (var i = 0; i < n; ++i)
+        {
+            if (mapping[i] != -1) continue;
+
+            int bestFree = -1;
+            double bestFreeCost = double.PositiveInfinity;
+
+            for (var j = 0; j < m; ++j)
+            {
+                if (targetTaken[j]) continue;
+                var c = originalCost[i, j];
+                if (c < bestFreeCost)
+                {
+                    bestFreeCost = c;
+                    bestFree = j;
+                }
+            }
+
+            if (bestFree != -1)
+            {
+                mapping[i] = bestFree;
+                targetTaken[bestFree] = true;
+                continue;
+            }
+
+            var bestAny = -1;
+            double bestAnyCost = double.PositiveInfinity;
+            for (var j = 0; j < m; ++j)
+            {
+                var c = originalCost[i, j];
+                if (c < bestAnyCost)
+                {
+                    bestAnyCost = c;
+                    bestAny = j;
+                }
+            }
+
+            if (bestAny >= 0)
+                mapping[i] = bestAny;
+            else
+                mapping[i] = 0;
+        }
+
         return mapping;
     }
+
 
     private static Graph BuildSupergraph(Graph pattern, Graph target, int[] mapping)
     {
@@ -241,6 +294,7 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
     {
         var mappingResult = ComputeEditDistance(g1, g2);
         var missingEdges = CalculateMissingEdges(g1, g2, mappingResult.Mapping);
+
         return new Results(mappingResult.Mapping, missingEdges, mappingResult.IsExact, mappingResult.Supergraph, g2.size);
     }
 

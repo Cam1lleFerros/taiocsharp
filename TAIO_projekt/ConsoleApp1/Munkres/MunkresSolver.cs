@@ -22,11 +22,10 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
         var totalSize = n + m;
         var C = new double[totalSize, totalSize];
 
-        var large = 1e6;
         for (var i = 0; i < totalSize; ++i)
         {
             for (var j = 0; j < totalSize; ++j)
-                C[i, j] = large;
+                C[i, j] = double.PositiveInfinity;
         }
 
         for (var i = 0; i < n; ++i)
@@ -36,7 +35,7 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
         }
 
         for (var i = 0; i < n; ++i)
-            C[i, m + i] = NodeDeletionCost(pattern, i);
+            C[i, m + i] = double.PositiveInfinity;
 
         for (var j = 0; j < m; ++j)
             C[n + j, j] = NodeInsertionCost(target, j);
@@ -87,7 +86,7 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
                 else if (i < dp) 
                 {
                     var u = pNeighbors[i];
-                    L[i, j] = NodeDeletionCost(pattern, u);
+                    L[i, j] = double.PositiveInfinity;
                 }
                 else if (j < dt)
                 {
@@ -112,11 +111,6 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
             return 0.0;
 
         return edgeEditCost * Math.Abs(dpu - dtv);
-    }
-
-    private double NodeDeletionCost(Graph pattern, int pNode)
-    {
-        return nodeDeleteCostBase + edgeEditCost * pattern.OutDegree(pNode);
     }
 
     private double NodeInsertionCost(Graph target, int tNode)

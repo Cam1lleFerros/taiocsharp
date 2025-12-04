@@ -17,6 +17,7 @@ public class SIOptions
     public bool generate = false;
     public bool verbose = false;
     public bool clean = false;
+    public bool dynamic = false;
 
     public SIOptions(string[] args)
     {
@@ -79,7 +80,10 @@ public class SIOptions
         }
 
         if (!exact && !approximate)
-            throw new ArgumentException("At least one of --exact or --approximate options must be specified.");
+        {
+            Console.WriteLine("No algorithm specified; the program will choose exact or approximate based on input sizes.");
+            dynamic = true;
+        }
     }
 
     static void ShowHelp(OptionSet p)

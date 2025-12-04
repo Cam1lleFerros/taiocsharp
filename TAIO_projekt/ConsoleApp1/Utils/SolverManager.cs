@@ -17,6 +17,14 @@ public class SolverManager
     private readonly Graph g2;
     private readonly bool batchSolving = false;
 
+    private static int chooseAlgorithm(int n1, int n2, int m1, int m2)
+    {
+        if (n1 <= 10 && n2 <= 100)
+            return 0; // Ullman
+        else
+            return 1; // Munkres
+    }
+
     public void RegisterSolver(ISubgraphIsomorphismSolver solver)
     {
         solvers.Add(solver);
@@ -44,7 +52,16 @@ public class SolverManager
             RegisterSolver(new UllmanSolver());
         if (options.approximate)
             RegisterSolver(new MunkresSolver());
-
+        if (solvers.Count == 0)
+        {
+            int alg = chooseAlgorithm(g1.size, g2.size, g1.EdgeCount(), g2.EdgeCount());
+            if (alg == 0)
+                RegisterSolver(new UllmanSolver());
+            else
+                RegisterSolver(new MunkresSolver());
+            Console.WriteLine($"No solver specified, selected default solver based on input sizes: {(alg == 0 ? "Ullman" : "Munkres")}");
+        }
+            
         this.options = options;
     }
 

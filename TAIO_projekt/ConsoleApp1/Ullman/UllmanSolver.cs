@@ -205,15 +205,30 @@ public class UllmanSolver : ISubgraphIsomorphismSolver
     public Results Solve(SubgraphIsomorphism.Utils.Graph g1, SubgraphIsomorphism.Utils.Graph g2)
     {
         var ullman = new Ullman(g1, g2);
-        var (result, matrix) = ullman.FindIsomorphism();
+        var (exact, mapping, cost, edges) = ullman.FindIsomorphismOrExtension();
 
-        if (result)
-            return new Results(matrix!, 0, true, null);
+        if (exact)
+            return new Results(mapping!, cost, exact, null);
         else
         {
-            var (expandedG2, workingMapping) = Expand(g1, g2, matrix);
-            var missingEdges = CountEdgesToAdd(g1, expandedG2, workingMapping);
-            return new Results(workingMapping, missingEdges, false, expandedG2);
+            //var (expandedG2, workingMapping) = Expand(g1, g2, matrix);
+            //var missingEdges = CountEdgesToAdd(g1, expandedG2, workingMapping);
+            Graph supergraph = new Graph(g2.size);
+            for (var i = 0; i < g2.size; ++i)
+            {
+                for (var j = 0; j < g2.size; ++j)
+                {
+                    supergraph.adjMatrix[i, j] = g2.adjMatrix[i, j];
+             
+                }
+            }
+            foreach(var edge in edges)
+            {
+                supergraph.adjMatrix[edge.Item1, edge.Item2] = true;
+                supergraph.edgesWereAdded = true;
+                supergraph.isNewEdge[edge.Item1, edge.Item2] = true;
+            }
+            return new Results(mapping!, cost, exact, supergraph);
         }
     }
 

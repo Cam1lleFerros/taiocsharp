@@ -6,15 +6,17 @@ public class Ullman(Graph p, Graph g)
     public Graph g = g, p = p;
     private int deepestMatch = 0;
     private bool[,]? bestMatch = null;
+    private int bestCost = int.MaxValue;
+    private List<(int, int)> bestEdgesToAdd = [];
+
 
     private int Rows => p.size;
     private int Cols => g.size;
 
-    public (bool, bool[,]?) FindIsomorphism()
+    public (bool foundExact, bool[,]? mapping, int cost, List<(int, int)> edgesToAdd) FindIsomorphismOrExtension()
     {
         var mapping = new bool[Rows, Cols];
         var usedColumns = new bool[Cols];
-        Array.Fill(usedColumns, false);
 
         for (var i = 0; i < Rows; ++i)
         {
@@ -37,32 +39,75 @@ public class Ullman(Graph p, Graph g)
                 }
             }
             if (!hasCandidate)
-                return (false, null);
+                return (false, null, int.MaxValue, []);
         }
 
-        var res = Recurse(mapping, 0, usedColumns);
-        if (res != null)
-            return (true, res);
-        else
-            return (false, bestMatch);
+        RecurseWithCost(mapping, 0, usedColumns, 0, 0);
+
+        if (bestMatch != null)
+        {
+            var finalMapping = new bool[Rows, Cols];
+            var vertexMap = new int[Rows];
+            for (int i = 0; i < Rows; i++)
+            {
+                for (int j = 0; j < Cols; j++)
+                {
+                    if (bestMatch[i, j])
+                    {
+                        finalMapping[i, j] = true;
+                        vertexMap[i] = j;
+                        break;
+                    }
+                }
+            }
+
+            var edgesToAdd = new List<(int, int)>();
+            for (int i = 0; i < Rows; i++)
+            {
+                for (int j = 0; j < Rows; j++)
+                {
+                    if (p.adjMatrix[i, j] && !g.adjMatrix[vertexMap[i], vertexMap[j]])
+                    {
+                        edgesToAdd.Add((vertexMap[i], vertexMap[j]));
+                    }
+                }
+            }
+
+            bool exact = (bestCost == 0);
+            return (exact, finalMapping, bestCost, edgesToAdd);
+        }
+
+        return (false, null, int.MaxValue, []);
     }
 
-    public bool[,]? Recurse(bool[,] mapping, int currentRow, bool[] usedColumns, int depth = 0)
+    private void RecurseWithCost(bool[,] mapping, int currentRow, bool[] usedColumns,
+                                 int currentCost, int depth)
     {
+        if (currentCost >= bestCost)
+            return;
+
         if (currentRow == Rows)
         {
-            if (IsValidMapping(mapping))
-                return mapping;
-            return null;
+            if (IsCompleteInjectiveMapping(mapping))
+            {
+
+                int finalCost = CalculateMissingEdgesCost(mapping);
+                if (finalCost < bestCost)
+                {
+                    bestCost = finalCost;
+                    bestMatch = (bool[,])mapping.Clone();
+                    deepestMatch = depth;
+                }
+            }
+            return;
         }
         if (depth > deepestMatch)
         {
             deepestMatch = depth;
-            bestMatch = (bool[,])mapping.Clone();
         }
 
         var mprim = (bool[,])mapping.Clone();
-        Prune(mprim);
+        PruneWithCostTracking(mprim, currentCost);
 
         for (var col = 0; col < Cols; ++col)
         {
@@ -74,17 +119,52 @@ public class Ullman(Graph p, Graph g)
                 for (var i = 0; i < Cols; ++i)
                     newMapping[currentRow, i] = i == col;
 
-                var result = Recurse(newMapping, currentRow + 1, usedColumns, depth + 1);
-                if (result != null)
-                    return result;
+                int additionalCost = CalculateAdditionalCost(newMapping, currentRow, col, usedColumns);
+                int newCost = currentCost + additionalCost;
+
+                if (newCost < bestCost)
+                {
+                    RecurseWithCost(newMapping, currentRow + 1, usedColumns, newCost, depth + 1);
+                }
 
                 usedColumns[col] = false;
             }
         }
-        return null;
     }
 
-    private void Prune(bool[,] mprim)
+    private int CalculateAdditionalCost(bool[,] mapping, int currentRow, int chosenCol, bool[] usedColumns)
+    {
+        int cost = 0;
+
+        for (int prevRow = 0; prevRow < currentRow; prevRow++)
+        {
+            int prevCol = -1;
+            for (int c = 0; c < Cols; c++)
+            {
+                if (mapping[prevRow, c])
+                {
+                    prevCol = c;
+                    break;
+                }
+            }
+
+            if (prevCol != -1)
+            {
+                if (p.adjMatrix[currentRow, prevRow] && !g.adjMatrix[chosenCol, prevCol])
+                {
+                    cost++;
+                }
+                if (p.adjMatrix[prevRow, currentRow] && !g.adjMatrix[prevCol, chosenCol])
+                {
+                    cost++;
+                }
+            }
+        }
+
+        return cost;
+    }
+
+    private void PruneWithCostTracking(bool[,] mprim, int currentCost)
     {
         bool changed;
         do
@@ -98,16 +178,17 @@ public class Ullman(Graph p, Graph g)
                     {
                         foreach (var np in p.OutNeighbours(i))
                         {
-                            var hasMapping = false;
+                            bool hasFeasibleMapping = false;
                             foreach (var ng in g.OutNeighbours(j))
                             {
                                 if (mprim[np, ng])
                                 {
-                                    hasMapping = true;
+                                    hasFeasibleMapping = true;
                                     break;
                                 }
                             }
-                            if (!hasMapping)
+
+                            if (!hasFeasibleMapping && currentCost + 1 >= bestCost)
                             {
                                 mprim[i, j] = false;
                                 changed = true;
@@ -120,38 +201,55 @@ public class Ullman(Graph p, Graph g)
         } while (changed);
     }
 
-    private bool IsValidMapping(bool[,] mapping)
+    private bool IsCompleteInjectiveMapping(bool[,] mapping)
     {
         for (var i = 0; i < Rows; ++i)
         {
-            var sum = 0;
+            var count = 0;
             for (var j = 0; j < Cols; ++j)
-                sum += mapping[i, j] ? 1 : 0;
-            if (sum != 1)
-                return false;
+                if (mapping[i, j]) count++;
+            if (count != 1) return false;
         }
 
-        for (var i = 0; i < Rows; ++i)
+        for (var j = 0; j < Cols; ++j)
         {
-            for (var j = 0; j < Rows; ++j)
+            var count = 0;
+            for (var i = 0; i < Rows; ++i)
+                if (mapping[i, j]) count++;
+            if (count > 1) return false;
+        }
+
+        return true;
+    }
+
+    private int CalculateMissingEdgesCost(bool[,] mapping)
+    {
+        var vertexMap = new int[Rows];
+        for (int i = 0; i < Rows; i++)
+        {
+            for (int j = 0; j < Cols; j++)
             {
-                if (p.adjMatrix[i, j])
+                if (mapping[i, j])
                 {
-                    var mappedI = -1;
-                    var mappedJ = -1;
-
-                    for (var k = 0; k < Cols; ++k)
-                    {
-                        if (mapping[i, k]) mappedI = k;
-                        if (mapping[j, k]) mappedJ = k;
-                    }
-
-                    if (mappedI != -1 && mappedJ != -1 && !g.adjMatrix[mappedI, mappedJ])
-                        return false;
+                    vertexMap[i] = j;
+                    break;
                 }
             }
         }
-        return true;
+
+        int missingEdges = 0;
+        for (int i = 0; i < Rows; i++)
+        {
+            for (int j = 0; j < Rows; j++)
+            {
+                if (p.adjMatrix[i, j] && !g.adjMatrix[vertexMap[i], vertexMap[j]])
+                {
+                    missingEdges++;
+                }
+            }
+        }
+
+        return missingEdges;
     }
 
     private static int GetInDegree(Graph graph, int node)

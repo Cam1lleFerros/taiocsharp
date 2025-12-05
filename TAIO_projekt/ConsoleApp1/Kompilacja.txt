@@ -11,3 +11,5 @@ i kliknąć prawym przyciskiem na projekt. Z zakładki wybierami opcję 'Publish
 rozwijamy również opcje 'File publish options' i zaznaczamy 'Produce single file' i 'Enable ReadyToRun Compilation'. Po czym klikamy 
 w opcję 'Publish'.
 
+Uwaga: we wczesnych wersjach Visual Studio 2026 jest błąd, który uniemożliwia kompilację mimo spełnionych wymagań, można go samemu naprawić:
+https://developercommunity.visualstudio.com/t/AOT-publish-issue-while-Target-Net-8-an/11000134?space=8&q=This+project+is+targeting+a+version+of+.NET+which+is+not+installed

@@ -117,7 +117,7 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
     {
         var dpu = pattern.OutDegree(pu);
         var dtv = target.OutDegree(tv);
-        // Jeżeli chcesz surowiej karać, podnieś wagę:
+
         return edgeCost * Math.Abs(dpu - dtv);
     }
 

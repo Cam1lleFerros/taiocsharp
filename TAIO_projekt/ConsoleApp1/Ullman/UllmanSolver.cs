@@ -217,10 +217,7 @@ public class UllmanSolver : ISubgraphIsomorphismSolver
             for (var i = 0; i < g2.size; ++i)
             {
                 for (var j = 0; j < g2.size; ++j)
-                {
                     supergraph.adjMatrix[i, j] = g2.adjMatrix[i, j];
-             
-                }
             }
             foreach(var edge in edges)
             {

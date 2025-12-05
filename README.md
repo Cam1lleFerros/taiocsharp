@@ -47,7 +47,10 @@ Drugi z tych plików jest oznaczony ciągiem liter "_izo_" w nazwie, i dołącza
 ## Przykłady użycia
 
 ### Folder \EXAMPLES
-W folderze \EXAMPLES znajduje się siedem prostych plików z danymi do sprawdzenia działania programu. Omówione są one poniżej:
+W folderze \EXAMPLES znajduje się siedem prostych plików z danymi do sprawdzenia działania programu.
+By wywołać program na tych przykładach, należy użyć komendy:
+`./SubgraphIsomorphism.exe --inputDir="<PROJECTPATH>\\taiocsharp\\Examples\\INPUTS" --outputDir="<PROJECTPATH>\\taiocsharp\\Examples\\SOLVED" -e -a -v"`, gdzie `<PROJECTPATH>` to ścieżka do folderu z projektem.
+Przykłady omówione są one poniżej:
 
 #### k3_k5
 Graf wzorca: graf pełny $K_3$

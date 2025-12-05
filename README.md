@@ -46,6 +46,18 @@ Drugi z tych plików jest oznaczony ciągiem liter "_izo_" w nazwie, i dołącza
 
 ## Przykłady użycia
 
+#### Generacja losowych danych wejściowych
+
+Do generacji danych wejściowych zaleca się uruchomienie programu z poniższymi argumentami:
+`.\SubgraphIsomorphism.exe --outputDir="<PROJECTPATH>\\SIPinputs" -g -l`
+Powyższe opcje wygenerują 27 plików z danymi, gdzie rozmiar grafu docelowego to 10, a rozmiar wzorca będzie zakresem od 1 do 9. Prawdopodobieństwo istnienia krawędzi w tym wypadku wynosić będzie $0,5$. Pliki w folderze SIPinputs będą nazwane
+według następującego schematu:
+dane_[izo_]_wzór<n>_cel<m>[_mapping].txt
+
+- Jeśli w nazwie znajduje się ciąg [_izo], to dla tych danych istnieje w grafie docelowym podgraf izomorficzny z wzorcem. Dostarczony wtedy będzie również plik `_mapping` dla danych, zawierający przykładowe takie mapowanie.
+- $n$ to rozmiar wzorca, a $m$ to rozmiar grafu docelowego
+- **UWAGA**: jeśli plik zawiera ciąg [_izo], to zawiera izomorfizm. Nie oznacza to, że pliki bez [_izo] w nazwie nie mogą zawierać izomorfizmu.
+
 ### Folder \EXAMPLES
 W folderze \EXAMPLES znajduje się siedem prostych plików z danymi do sprawdzenia działania programu.
 By wywołać program na tych przykładach, należy użyć komendy:

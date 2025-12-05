@@ -76,7 +76,10 @@ public class Graph
         for (var i = 0; i < size; ++i)
         {
             for (var j = 0; j < size; ++j)
-                if (adjMatrix[i, j]) ++sum;
+            {
+                if (adjMatrix[i, j])
+                    ++sum;
+            }
         }
         return sum;
     }

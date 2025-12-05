@@ -124,13 +124,13 @@ public static class PrintGraphUtils
         {
             if (p.EdgeCount() >= g.EdgeCount())
             {
-                g1 = p;
-                g2 = g;
+                g2 = p;
+                g1 = g;
             }
             else
             {
-                g1 = g;
-                g2 = p;
+                g2 = g;
+                g1 = p;
             }
         }
         else

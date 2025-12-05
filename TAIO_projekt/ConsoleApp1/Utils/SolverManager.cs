@@ -17,7 +17,7 @@ public class SolverManager
     private readonly Graph g2;
     private readonly bool batchSolving = false;
 
-    private static int chooseAlgorithm(int n1, int n2, int m1, int m2)
+    private static int ChooseAlgorithm(int n1, int n2, int m1, int m2)
     {
         if (n1 <= 10 && n2 <= 100)
             return 0; // Ullman
@@ -25,19 +25,14 @@ public class SolverManager
             return 1; // Munkres
     }
 
-    public void RegisterSolver(ISubgraphIsomorphismSolver solver)
-    {
-        solvers.Add(solver);
-    }
+    public void RegisterSolver(ISubgraphIsomorphismSolver solver) =>  solvers.Add(solver);
 
     public SolverManager(string[] args)
     {
         SIOptions options = new(args);
 
         if (options.inDirectory == string.Empty)
-        {
             (g1, g2) = PrintGraphUtils.PrepGraphs(options.inPath);
-        }
         else
         {
             batchSolving = true;
@@ -66,7 +61,7 @@ public class SolverManager
     {
         if (options.dynamic)
         {
-            var algIdx = chooseAlgorithm(g1.size, g2.size, g1.EdgeCount(), g2.EdgeCount());
+            var algIdx = ChooseAlgorithm(g1.size, g2.size, g1.EdgeCount(), g2.EdgeCount());
             Solve(g1, g2, algIdx);
             return;
         }
@@ -92,9 +87,9 @@ public class SolverManager
             var outputFileName = Path.GetFileName(inputFile);
             outputFileName = outputFileName.Replace(".txt", "_out.txt");
             var outPath = Path.Combine(options.outDirectory, outputFileName);
-            if(options.dynamic)
+            if (options.dynamic)
             {
-                var algIdx = chooseAlgorithm(g1.size, g2.size, g1.EdgeCount(), g2.EdgeCount());
+                var algIdx = ChooseAlgorithm(g1.size, g2.size, g1.EdgeCount(), g2.EdgeCount());
                 PrintGraphUtils.PrintMessageOptions($"Dla pliku {inputFile} wybrano algorytm {(algIdx == 0 ? "Ullmana" : "Munkresa")}.", logWriter, options);
                 Solve(g1, g2, algIdx, outPath, logWriter);
             }
@@ -136,8 +131,6 @@ public class SolverManager
 
     public void Solve(Graph g1, Graph g2, int idx = 0, string outPath = "", StreamWriter? logWriter = null)
     {
-
-
         if (String.IsNullOrEmpty(outPath))
             outPath = options.outPath;
 

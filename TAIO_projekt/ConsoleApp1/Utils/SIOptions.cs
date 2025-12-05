@@ -22,22 +22,21 @@ public class SIOptions
     public SIOptions(string[] args)
     {
         var opts = new OptionSet() {
-        { "input=", "ścieżka pliku z danymi (domyślnie: input.txt)", v => inPath = v },
-        { "output=", "ścieżka do pliku z odpowiedzią, który zostanie utworzony lub zaktualizowany (domyślnie: output.txt)", v => {outPath = v; } },
-        { "inputDir=", "ścieżka do folderu z plikami z danymi dla rozwiązywania masowego", v => inDirectory = v },
-        { "outputDir=", "ścieżka do folderu z plikami odpowiedzi dla rozwiązywania masowego", v => outDirectory = v },
-        { "seed=", "ścieżka do pliku generacji danych. Szczegóły w dokumentacji.", v => seedPath = v },
-        { "g|generate", "zamiast rozwiązywać problemy, program generuje losowe dane w folderze sprecyzowanym przez --outputDir.", v =>  {generate = true; }},
-        { "e|exact", "program użyje algorytmu dokładnego (Ullmana)", v => { exact = true; } },
-        { "a|approximate", "program użyje algorytmu przybliżonego (Munkresa/węgierskiego)" ,v => { approximate = true; } },
-        { "c|console", "program wypisze odpowiedzi na standardowe wyjście", v => console = true},
-        { "p|append", "program dopisze odpowiedzi w plikach wyjściowych, jeśli już istnieją, zamiast je nadpisywać", v => append = true },
-        { "v|verbose", "program zapisze czas rozwiązywania do plików wyjściowych", v => verbose = true },
-        { "l|clean", "program wyczyści folder --outputDir przed tworzeniem w nim nowych plików", v => clean = true },
-        { "h|?|help", "pomoc",  v => help = v != null },
-
-    };
-        List<string> extra = opts.Parse(args);
+            { "input=", "ścieżka pliku z danymi (domyślnie: input.txt)", v => inPath = v },
+            { "output=", "ścieżka do pliku z odpowiedzią, który zostanie utworzony lub zaktualizowany (domyślnie: output.txt)", v => {outPath = v; } },
+            { "inputDir=", "ścieżka do folderu z plikami z danymi dla rozwiązywania masowego", v => inDirectory = v },
+            { "outputDir=", "ścieżka do folderu z plikami odpowiedzi dla rozwiązywania masowego", v => outDirectory = v },
+            { "seed=", "ścieżka do pliku generacji danych. Szczegóły w dokumentacji.", v => seedPath = v },
+            { "g|generate", "zamiast rozwiązywać problemy, program generuje losowe dane w folderze sprecyzowanym przez --outputDir.", v =>  {generate = true; }},
+            { "e|exact", "program użyje algorytmu dokładnego (Ullmana)", v => { exact = true; } },
+            { "a|approximate", "program użyje algorytmu przybliżonego (Munkresa/węgierskiego)", v => { approximate = true; } },
+            { "c|console", "program wypisze odpowiedzi na standardowe wyjście", v => console = true},
+            { "p|append", "program dopisze odpowiedzi w plikach wyjściowych, jeśli już istnieją, zamiast je nadpisywać", v => append = true },
+            { "v|verbose", "program zapisze czas rozwiązywania do plików wyjściowych", v => verbose = true },
+            { "l|clean", "program wyczyści folder --outputDir przed tworzeniem w nim nowych plików", v => clean = true },
+            { "h|?|help", "pomoc",  v => help = v != null },
+        };
+        var extra = opts.Parse(args);
 
         if (help || args.Length == 0)
         {
@@ -79,14 +78,10 @@ public class SIOptions
         }
 
         if (!exact && !approximate)
-        {
             dynamic = true;
-        }
 
-        if(outDirectory != String.Empty && !Directory.Exists(outDirectory))
-        {
+        if (outDirectory != String.Empty && !Directory.Exists(outDirectory))
             Directory.CreateDirectory(outDirectory);
-        }
     }
 
     static void ShowHelp(OptionSet p)

@@ -82,6 +82,11 @@ public class SIOptions
         {
             dynamic = true;
         }
+
+        if(outDirectory != String.Empty && !Directory.Exists(outDirectory))
+        {
+            Directory.CreateDirectory(outDirectory);
+        }
     }
 
     static void ShowHelp(OptionSet p)

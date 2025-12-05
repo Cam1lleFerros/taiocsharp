@@ -27,6 +27,7 @@ public class Ullman(Graph p, Graph g)
             }
         }
 
+        int currentCost = 0;
         for (var i = 0; i < Rows; ++i)
         {
             bool hasCandidate = false;
@@ -39,10 +40,16 @@ public class Ullman(Graph p, Graph g)
                 }
             }
             if (!hasCandidate)
-                return (false, null, int.MaxValue, []);
+            {
+                for(var j = 0; j < Cols; ++j)
+                {
+                    mapping[i, j] = true;
+                    currentCost++;
+                }
+            }
         }
 
-        RecurseWithCost(mapping, 0, usedColumns, 0, 0);
+        RecurseWithCost(mapping, 0, usedColumns, currentCost, 0);
 
         if (bestMatch != null)
         {

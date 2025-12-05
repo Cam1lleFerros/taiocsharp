@@ -9,7 +9,7 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
     private readonly double nodeBaseCost;
     private readonly double edgeCost;
 
-    private const double INF = double.MaxValue / 4;
+    private const double INF = 1e100;
 
     public MunkresSolver(double nodeBaseCost = 1.0, double edgeCost = 1.0)
     {
@@ -66,9 +66,7 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
 
     private double NodeSubstitutionCost(Graph pattern, Graph target, int pu, int tv)
     {
-        double nodeLabelCost = 0.0; // brak etykiet w przykładzie — jeśli masz etykiety zastąp
-        double local = LocalNeighborhoodCost(pattern, target, pu, tv);
-        return nodeLabelCost + local;
+        return LocalNeighborhoodCost(pattern, target, pu, tv);
     }
     private double LocalNeighborhoodCost(Graph pattern, Graph target, int p, int t)
     {
@@ -109,7 +107,7 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
             }
         }
 
-        var (assign, localCost) = Munkres.Solve(L);
+        var (_, localCost) = Munkres.Solve(L);
         return localCost;
     }
 

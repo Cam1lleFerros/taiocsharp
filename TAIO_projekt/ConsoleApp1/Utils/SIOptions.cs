@@ -80,7 +80,6 @@ public class SIOptions
 
         if (!exact && !approximate)
         {
-            Console.WriteLine("Nie został wybrany żaden algorytm - program dobierze algorytm do rozmiaru grafów p i g.");
             dynamic = true;
         }
     }

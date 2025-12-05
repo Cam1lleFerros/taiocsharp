@@ -52,14 +52,11 @@ public class SolverManager
             RegisterSolver(new UllmanSolver());
         if (options.approximate)
             RegisterSolver(new MunkresSolver());
-        if (solvers.Count == 0)
+        if (options.dynamic)
         {
-            int alg = chooseAlgorithm(g1.size, g2.size, g1.EdgeCount(), g2.EdgeCount());
-            if (alg == 0)
-                RegisterSolver(new UllmanSolver());
-            else
-                RegisterSolver(new MunkresSolver());
-            Console.WriteLine($"Nie został jawnie wybrany algorytm - algorytm wybrany zostanie dynamicznie: {(alg == 0 ? "Ullman" : "Munkres")}");
+            RegisterSolver(new UllmanSolver());
+            RegisterSolver(new MunkresSolver());
+            Console.WriteLine($"Nie został jawnie wybrany algorytm - algorytm wybrany zostanie dynamicznie.");
         }
             
         this.options = options;
@@ -67,6 +64,12 @@ public class SolverManager
 
     public void SolveAll()
     {
+        if (options.dynamic)
+        {
+            var algIdx = chooseAlgorithm(g1.size, g2.size, g1.EdgeCount(), g2.EdgeCount());
+            Solve(g1, g2, algIdx);
+            return;
+        }
         for (var i = 0; i < solvers.Count; ++i)
             Solve(g1, g2, i);
     }
@@ -89,8 +92,17 @@ public class SolverManager
             var outputFileName = Path.GetFileName(inputFile);
             outputFileName = outputFileName.Replace(".txt", "_out.txt");
             var outPath = Path.Combine(options.outDirectory, outputFileName);
-            for (var i = 0; i < solvers.Count; ++i)
-                Solve(g1, g2, i, outPath, logWriter);
+            if(options.dynamic)
+            {
+                var algIdx = chooseAlgorithm(g1.size, g2.size, g1.EdgeCount(), g2.EdgeCount());
+                PrintGraphUtils.PrintMessageOptions($"Dla pliku {inputFile} wybrano algorytm {(algIdx == 0 ? "Ullmana" : "Munkresa")}.", logWriter, options);
+                Solve(g1, g2, algIdx, outPath, logWriter);
+            }
+            else
+            {
+                for (var i = 0; i < solvers.Count; ++i)
+                    Solve(g1, g2, i, outPath, logWriter);
+            }
             ++processedCount;
             timer.Stop();
             var infoString = $"Przetworzono {processedCount} z {inputCount} plików.";

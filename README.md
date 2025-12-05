@@ -1,9 +1,9 @@
-# ISOlver
+# ISOLVER
 ## Program do rozwiązywania problemu izomorfizmu podgrafów
 
 Problem izomorfizmu podgrafów (ang. *Subgraph Isomorphism Problem*, SIP) dany jest przez dwa grafy na wejściu, **p** i **g**, t.że  V(**p**) <= V(**g**). Program ma za zadanie znaleźć odpowiedź na dwa pytania: po pierwsze, czy istnieje takie mapowanie 
-**M**: V(**p**) ->  V(**g**), przy którym dla każdej krawędzi (*u*, *v*) w **p** istnieje krawędź (**M(*u*)**, **M(*v*)**) w **g**. Problem ten jest NP-zupełny, czyli nie istnieją szybkie dokładne algorytmy rozwiązujące go. W ISOlver zaimplementowane są
-dwa algorytmy: algorytm Ullmana, czyli algorytm dokładny o złożoności wykładniczej, rozszerzony o znajdywanie dopełnienia grafu docelowego **g**, oraz algorytm przybliżony na podstawie algorytmu węgierskiego (tzw. algorytmu Munkersa), który działa znacznie szybciej.
+**M**: V(**p**) ->  V(**g**), przy którym dla każdej krawędzi (*u*, *v*) w **p** istnieje krawędź (**M(*u*)**, **M(*v*)**) w **g**. Problem ten jest NP-zupełny, czyli nie istnieją szybkie dokładne algorytmy rozwiązujące go. W ISOLVER zaimplementowane są
+dwa algorytmy: algorytm Ullmana, czyli algorytm dokładny o złożoności wykładniczej, rozszerzony o znajdywanie dopełnienia grafu docelowego **g**, oraz algorytm przybliżony na podstawie algorytmu węgierskiego (tzw. algorytmu Munkresa), który działa znacznie szybciej.
 
 ## Instrukcja
 

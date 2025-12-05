@@ -6,26 +6,41 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
 {
     public record MappingResult(int[] Mapping, double EditDistance, bool IsExact, Graph Supergraph);
 
-    private readonly double nodeDeleteCostBase; 
-    private readonly double edgeEditCost;
+    private readonly double nodeBaseCost;
+    private readonly double edgeCost;
 
-    public MunkresSolver(double nodeDeleteCostBase = 1.0, double edgeEditCost = 1.0)
+    private const double INF = double.MaxValue / 4;
+
+    public MunkresSolver(double nodeBaseCost = 1.0, double edgeCost = 1.0)
     {
-        this.nodeDeleteCostBase = nodeDeleteCostBase;
-        this.edgeEditCost = edgeEditCost;
+        this.nodeBaseCost = nodeBaseCost;
+        this.edgeCost = edgeCost;
+    }
+
+    public MappingResult ComputeEditDistance(Graph pattern, Graph target)
+    {
+        var costMatrix = BuildCostMatrix(pattern, target);
+        var (assignment, totalCost) = Munkres.Solve(costMatrix);
+
+        var mapping = ExtractNodeMappingForceReal(assignment, pattern.size, target.size, costMatrix);
+        var supergraph = BuildSupergraph(pattern, target, mapping);
+
+        var isExact = IsExactSubgraphIsomorphism(pattern, target, mapping);
+
+        return new MappingResult(mapping, totalCost, isExact, supergraph);
     }
 
     public double[,] BuildCostMatrix(Graph pattern, Graph target)
     {
         var n = pattern.size;
         var m = target.size;
-        var totalSize = n + m;
-        var C = new double[totalSize, totalSize];
+        var total = n + m;
+        var C = new double[total, total];
 
-        for (var i = 0; i < totalSize; ++i)
+        for (var i = 0; i < total; ++i)
         {
-            for (var j = 0; j < totalSize; ++j)
-                C[i, j] = double.PositiveInfinity;
+            for (var j = 0; j < total; ++j)
+                C[i, j] = INF;
         }
 
         for (var i = 0; i < n; ++i)
@@ -35,7 +50,7 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
         }
 
         for (var i = 0; i < n; ++i)
-            C[i, m + i] = double.PositiveInfinity;
+            C[i, m + i] = INF;
 
         for (var j = 0; j < m; ++j)
             C[n + j, j] = NodeInsertionCost(target, j);
@@ -49,15 +64,12 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
         return C;
     }
 
-    private double NodeSubstitutionCost(Graph pattern, Graph target, int p, int t)
+    private double NodeSubstitutionCost(Graph pattern, Graph target, int pu, int tv)
     {
-        double nodeLabelCost = 0.0;
-
-        double localEdgeCost = LocalNeighborhoodCost(pattern, target, p, t);
-
-        return nodeLabelCost + localEdgeCost;
+        double nodeLabelCost = 0.0; // brak etykiet w przykładzie — jeśli masz etykiety zastąp
+        double local = LocalNeighborhoodCost(pattern, target, pu, tv);
+        return nodeLabelCost + local;
     }
-
     private double LocalNeighborhoodCost(Graph pattern, Graph target, int p, int t)
     {
         var pNeighbors = GetNeighbors(pattern, p).ToList();
@@ -80,72 +92,55 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
                 {
                     var u = pNeighbors[i];
                     var v = tNeighbors[j];
-
                     L[i, j] = NeighborSubstitutionCost(pattern, target, u, v);
                 }
-                else if (i < dp) 
-                    L[i, j] = double.PositiveInfinity;
-                else if (j < dt)
+                else if (i < dp)
+                {
+                    var u = pNeighbors[i];
+                    L[i, j] = nodeBaseCost + edgeCost * pattern.OutDegree(u);
+                }
+                else if (j < dt) 
                 {
                     var v = tNeighbors[j];
-                    L[i, j] = NodeInsertionCost(target, v);
+                    L[i, j] = nodeBaseCost + edgeCost * target.OutDegree(v);
                 }
                 else
                     L[i, j] = 0.0;
             }
         }
 
-        var (assignment, totalLocalCost) = Munkres.Solve(L);
-        return totalLocalCost;
+        var (assign, localCost) = Munkres.Solve(L);
+        return localCost;
     }
 
     private double NeighborSubstitutionCost(Graph pattern, Graph target, int pu, int tv)
     {
         var dpu = pattern.OutDegree(pu);
         var dtv = target.OutDegree(tv);
-
-        if (dpu == dtv) 
-            return 0.0;
-
-        return edgeEditCost * Math.Abs(dpu - dtv);
+        // Jeżeli chcesz surowiej karać, podnieś wagę:
+        return edgeCost * Math.Abs(dpu - dtv);
     }
 
     private double NodeInsertionCost(Graph target, int tNode)
     {
-        return nodeDeleteCostBase + edgeEditCost * target.OutDegree(tNode);
+        return nodeBaseCost + edgeCost * target.OutDegree(tNode);
     }
+
 
     private static List<int> GetNeighbors(Graph g, int node)
     {
         var list = new List<int>();
-        for (var i = 0; i < g.size; ++i)
+        for (var i = 0; i < g.size; i++)
         {
-            if (i != node && (g.adjMatrix[node, i] || g.adjMatrix[i, node]))
+            if (i == node) continue;
+            if (g.adjMatrix[node, i] || g.adjMatrix[i, node])
                 list.Add(i);
         }
         return list;
     }
 
-    public MappingResult ComputeEditDistance(Graph pattern, Graph target)
+    private static int[] ExtractNodeMappingForceReal(bool[,] assignment, int n, int m, double[,] originalCost)
     {
-        var costMatrix = BuildCostMatrix(pattern, target);
-        var (assignment, totalCost) = Munkres.Solve(costMatrix);
-
-        var mapping = ExtractNodeMapping(assignment, pattern.size, target.size, costMatrix);
-
-        var supergraph = BuildSupergraph(pattern, target, mapping);
-
-        var isExact = IsExactSubgraphIsomorphism(pattern, target, mapping);
-
-        return new MappingResult(mapping, totalCost, isExact, supergraph);
-    }
-
-    private static int[] ExtractNodeMapping(bool[,] assignment, int n, int m, double[,] originalCost)
-    {
-        var totalSize = assignment.GetLength(0);
-        if (assignment.GetLength(1) != totalSize)
-            throw new ArgumentException("Przypisanie powinno być macierzą kwadratową.");
-
         var mapping = new int[n];
         Array.Fill(mapping, -1);
 
@@ -190,7 +185,7 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
             }
 
             var bestAny = -1;
-            double bestAnyCost = double.PositiveInfinity;
+            var bestAnyCost = double.PositiveInfinity;
             for (var j = 0; j < m; ++j)
             {
                 var c = originalCost[i, j];
@@ -201,15 +196,11 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
                 }
             }
 
-            if (bestAny >= 0)
-                mapping[i] = bestAny;
-            else
-                mapping[i] = 0;
+            mapping[i] = bestAny >= 0 ? bestAny : 0;
         }
 
         return mapping;
     }
-
 
     private static Graph BuildSupergraph(Graph pattern, Graph target, int[] mapping)
     {
@@ -218,14 +209,14 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
         for (var u = 0; u < pattern.size; ++u)
         {
             var mu = mapping[u];
-            if (mu < 0) continue;
+            if (mu < 0 || mu >= supergraph.size) continue;
 
             for (var v = 0; v < pattern.size; ++v)
             {
                 if (!pattern.adjMatrix[u, v]) continue;
 
                 var mv = mapping[v];
-                if (mv >= 0 && !supergraph.adjMatrix[mu, mv])
+                if (mv >= 0 && mv < supergraph.size && !supergraph.adjMatrix[mu, mv])
                 {
                     supergraph.adjMatrix[mu, mv] = true;
                     supergraph.edgesWereAdded = true;
@@ -250,7 +241,6 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
             for (var v = 0; v < pattern.size; ++v)
             {
                 if (!pattern.adjMatrix[u, v]) continue;
-
                 var mu = mapping[u];
                 var mv = mapping[v];
                 if (mu < 0 || mv < 0 || !target.adjMatrix[mu, mv])
@@ -270,11 +260,10 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
             for (var v = 0; v < pattern.size; ++v)
             {
                 if (!pattern.adjMatrix[u, v]) continue;
-
                 var mu = mapping[u];
                 var mv = mapping[v];
                 if (mu < 0 || mv < 0 || !target.adjMatrix[mu, mv])
-                    missing++;
+                    ++missing;
             }
         }
 
@@ -283,12 +272,10 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
 
     public Results Solve(Graph g1, Graph g2)
     {
-        var mappingResult = ComputeEditDistance(g1, g2);
-        var missingEdges = CalculateMissingEdges(g1, g2, mappingResult.Mapping);
-
-        return new Results(mappingResult.Mapping, missingEdges, mappingResult.IsExact, mappingResult.Supergraph, g2.size);
+        var res = ComputeEditDistance(g1, g2);
+        var missingEdges = CalculateMissingEdges(g1, g2, res.Mapping);
+        return new Results(res.Mapping, missingEdges, res.IsExact, res.Supergraph, g2.size);
     }
 
-    public string Name() => "Przybliżenie Riesen-Bunke Bipartite (Munkres)"; // TODO: ZMIEN NAZWE
-    // Riesen-Bunke Bipartite (Munkres) Approximation
+    public string Name() => "Przybliżenie Munkres";
 }

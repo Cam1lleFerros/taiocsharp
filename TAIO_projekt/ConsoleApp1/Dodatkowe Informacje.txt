@@ -1,0 +1,40 @@
+Dodatkowe informacje dotyczące programu
+
+Zaawansowane argumenty wiersza polecenia
+
+--output=[ŚCIEŻKA DO PLIKU]		sprecyzowanie lokalizacji pliku z odpowiedzią
+--inputDir=[ŚCIEŻKA DO FOLDERU] 	folder z wieloma plikami wejściowymi
+--outputDir=[ŚCIEŻKA DO FOLDERU]	folder, gdzie zostaną utworzone pliki 						wyjściowe, jeśli jest ich wiele
+--seed=[ŚCIEŻKA DO PLIKU] 		ścieżka do pliku z ziarnem generatora
+-g, --generate				polecenie wygenerowania losowych danych wejściowych
+-c, --console				program wypisuje rozwiązanie na wiersz polecenia
+-p, --append				program dopisuje do plików wyjściowych, jeśli 						istnieją
+
+
+Ziarno generatora
+
+Przy używaniu flagi --generate, program pozwala użytkownikowi na zdefiniowanie parametrów losowej generacji danych przy użyciu pliku ziarna, wskazanego przez flagę --seed. Plik ziarna powinien zawierać pięć liczb, oddzielonych spacją. Po kolei, liczby te reprezentują:
+
+    Rozmiar grafu docelowego
+    Minimalny rozmiar grafu wzorca
+    Maksymalny rozmiar grafu wzorca
+    Krok generowania rozmiaru grafu wzorca
+    Prawdopodobieństwo wystąpienia krawędzi - liczba niecałkowita w zakresie [0;1], oddzielona przecinkiem, np. "0,15"
+
+Oprócz prawdopodobieństwa wystąpienia krawędzi, pozostałe wartości powinny być liczbami naturalnymi. Algorytm wygeneruje dwa pliki dla każdego zestawu rozmiarów wzorca i grafu docelowego - plik, który może zawierać izomorfizm (ze względu na wbudowaną losowość procesu generacji), oraz plik, który musi zawierać izomorfizm. Drugi z tych plików jest oznaczony ciągiem liter "izo" w nazwie, i dołączany jest do niego plik zakończony ciągiem "_mapping", demonstrujący poprawne mapowanie.
+
+Generacja losowych danych wejściowych
+
+Do generacji danych wejściowych zaleca się uruchomienie programu z poniższymi argumentami: .\SubgraphIsomorphism.exe --outputDir="<PROJECTPATH>\\SIPinputs" -g -l Powyższe opcje wygenerują 27 plików z danymi, gdzie rozmiar grafu docelowego to 10, a rozmiar wzorca będzie zakresem od 1 do 9. Prawdopodobieństwo istnienia krawędzi w tym wypadku wynosić będzie 0 , 5 . Pliki w folderze SIPinputs będą nazwane według następującego schematu: dane_[izo_]_wzór_cel[_mapping].txt
+
+    Jeśli w nazwie znajduje się ciąg [_izo], to dla tych danych istnieje w grafie docelowym podgraf izomorficzny z wzorcem. Dostarczony wtedy będzie również plik _mapping dla danych, zawierający przykładowe takie mapowanie.
+    n to rozmiar wzorca, a m to rozmiar grafu docelowego
+    UWAGA: jeśli plik zawiera ciąg [_izo], to zawiera izomorfizm. Nie oznacza to, że pliki bez [_izo] w nazwie nie mogą zawierać izomorfizmu.
+
+Folder \EXAMPLES
+W folderze \EXAMPLES znajduje się siedem prostych plików z danymi do sprawdzenia działania programu. By wywołać program na tych przykładach, należy użyć komendy: ./SubgraphIsomorphism.exe --inputDir="<PROJECTPATH>\\taiocsharp\\Examples\\INPUTS" --outputDir="<PROJECTPATH>\\taiocsharp\\Examples\\SOLVED" -e -a -v", gdzie <PROJECTPATH> to ścieżka do folderu z projektem.
+
+Specyfikacja plików wejściowych 
+
+Program akceptuje dane w postaci pojedynczego pliku tekstowego. W pierwszej linijce pliku powinna znajdywać się pojedyncza liczba całkowita oznaczająca liczbę wierzchołków pierwszego grafu (ozn. 'n'), po czym w kolejnych n liniach powinno znajdywać się po n liczb oddzielonych spacją, z których każda to 0 lub 1. 1 w i-tym wierszu i j-tej pozycji w tym wierszu oznacza istnienie krawędzi z i-tego do j-tego wierzchołka, tzn. dane wejściowe są po prostu macierzą sąsiedztwa pierwszego grafu. Po n-tej linijce macierzy sąsiedztwa, w następnych linijkach powinna znaleźć się analogiczna reprezentacja drugiego grafu.
+

@@ -1,14 +1,5 @@
-﻿Do kompilacji wymagane jest środowisko Visual Studio 2022 lub 2026, ze wsparciem C# 9.0 i pakietem 'Desktop development with C++'.
+﻿Aby skompilować program należy w katalogu projektu wykonać polecenie:
 
-Aby skompilować program w podstawowej wystarczy wczytać projekt i rozpocząć debugowanie (F5 lub zakładka Debug -> Start Debugging).
-Drugim sposobem jest przejście do konsoli Visual Studio i wykonaniu poleceń `dotnet build`, skompilowany program powinien pojawić
-się w odpowiednim katalogu docelowym.
+dotnet publish --nologo -v q
 
-Jeśli chcemy, żeby program działał bez pomocy bibliotek zewnętrznych i innych plików (np. dll), możemy go skompilować jako jeden plik.
-Przechodzimy wtedy do Solution Explorer w VS i klikamy prawym przyciskiem myszy na projekt. Z zakładki wybierami opcję 'Publish'. 
-Wybieramy wtedy dwukrotnie 'Folder', po czym ustawiamy ścieżkę, gdzie plik ma zostać skompilowany. Na ostatnim ekranie klikamy 
-'Show all settings' i ustawiamy 'Deployment mode' na 'Self-contained', rozwijamy również opcje 'File publish options'
-i zaznaczamy 'Produce single file' i 'Enable ReadyToRun Compilation'. Zmianę ustawień zapisujemy po czym klikamy w przycisk 'Publish'.
-
-Uwaga: we wczesnych wersjach Visual Studio 2026 jest błąd, który uniemożliwia kompilację mimo spełnionych wymagań, można go samemu naprawić:
-https://developercommunity.visualstudio.com/t/AOT-publish-issue-while-Target-Net-8-an/11000134?space=8&q=This+project+is+targeting+a+version+of+.NET+which+is+not+installed
+Skompilowany program będzie dostępny w podkatalogu ConsoleApp1/bin/Release/net9.0/win-x64/publish

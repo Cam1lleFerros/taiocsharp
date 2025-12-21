@@ -22,7 +22,7 @@ public class SIOptions
     public SIOptions(string[] args)
     {
         var opts = new OptionSet() {
-            { "input=", "ścieżka pliku z danymi (domyślnie: input.txt)", v => inPath = v },
+            { "f|input=", "ścieżka pliku z danymi (domyślnie: input.txt)", v => inPath = v },
             { "output=", "ścieżka do pliku z odpowiedzią, który zostanie utworzony lub zaktualizowany (domyślnie: output.txt)", v => {outPath = v; } },
             { "inputDir=", "ścieżka do folderu z plikami z danymi dla rozwiązywania masowego", v => inDirectory = v },
             { "outputDir=", "ścieżka do folderu z plikami odpowiedzi dla rozwiązywania masowego", v => outDirectory = v },
@@ -87,9 +87,19 @@ public class SIOptions
     static void ShowHelp(OptionSet p)
     {
         Console.WriteLine("Sposób używania programu:");
-        Console.WriteLine("Program rozwiązuje problem izomorfizmu podgrafów przy użyciu algorytmów Ullmana lub Munkresa.");
+        Console.WriteLine("Program rozwiązuje problem izomorfizmu podgrafów przy użyciu algorytmów Ullmana lub Munkresa. \nPlik z rozwiązaniem domyślnie utworzony zostanie w folderze zawierającym\n plik wykonywalny (.exe) i będzie nazwany 'output.txt'");
         Console.WriteLine();
         Console.WriteLine("Program akceptuje poniższe opcje:");
-        p.WriteOptionDescriptions(Console.Out);
+        Console.WriteLine("\t-f\t\tŚcieżka do pliku z danymi wejściowymi");
+        Console.WriteLine("\t-e\t\tUżyj algorytmu dokładnego (Ullmana)");
+        Console.WriteLine("\t-a\t\tUżyj algorytmu przybliżonego (Munkresa/węgierskiego)");
+        Console.WriteLine();
+        Console.WriteLine("[UWAGA]:Jeśli żadna z opcji -e lub -a nie zostanie podana, program wybierze algorytm dynamicznie na podstawie rozmiaru wzoru.");
+        Console.WriteLine();
+        Console.WriteLine("Przykłady wywołań:");
+        Console.WriteLine("\t.\\SubgraphIsomorphism.exe -f input.txt -e");
+        Console.WriteLine("\t.\\SubgraphIsomorphism.exe -f \"C:\\\\users\\\\Desktop\\\\input.txt\" -a");
+        Console.WriteLine();
+        Console.WriteLine("Program akceptuje również inne, bardziej zaawansowane opcje, opisane w dokumentacji.");
     }
 }

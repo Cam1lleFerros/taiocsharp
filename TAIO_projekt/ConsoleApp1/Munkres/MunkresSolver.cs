@@ -272,7 +272,7 @@ public class MunkresSolver : ISubgraphIsomorphismSolver
     {
         var res = ComputeEditDistance(g1, g2);
         var missingEdges = CalculateMissingEdges(g1, g2, res.Mapping);
-        return new Results(res.Mapping, missingEdges, res.IsExact, res.Supergraph, g2.size);
+        return new Results(res.Mapping, missingEdges, res.IsExact, res.Supergraph, g2.size, res.EditDistance);
     }
 
     public string Name() => "Przybliżenie Munkres";

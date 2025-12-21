@@ -157,6 +157,10 @@ public class SolverManager
         PrintGraphUtils.PrintMessageOptions($"--- Rezultaty dla algorytmu : {solver.Name()} ---", writer, options);
         if (options.verbose)
             PrintGraphUtils.PrintMessageOptions($"Czas działania: {timer.ElapsedMilliseconds} ms", writer, options);
+
+        if (results.EditDistance.HasValue)
+            PrintGraphUtils.PrintMessageOptions($"Odległość edycyjna: {results.EditDistance.Value}", writer, options);
+
         if (results.IsExact)
         {
             PrintGraphUtils.PrintMessageOptions(PrintGraphUtils.ExactMatchMessage, writer, options);
